@@ -1,0 +1,56 @@
+#+TITLE:        Chase E. Johnson
+#+SUBTITLE: [[github:cjohnson19][    GitHub]], [[https://www.linkedin.com/in/chase-johnson19/][LinkedIn]], [[./Chase_Johnson_Resume.pdf][Resume]]
+#+AUTHOR:       joh13266@umn.edu
+#+EMAIL:        joh13266@umn.edu
+#+DATE:         {{{modification-time(%Y-%m-%d %H:%M, t)}}}; {{{timezone}}}
+#+macro:        timezone (eval (substring (shell-command-to-string "date +%Z") 0 -1))
+#+startup:      overview
+#+LATEX_HEADER: \usepackage[margin=1in]{geometry}
+
+* Education
+I'm pursuing my MS in Computer Science at [[https://cse.umn.edu/cs][University of Minnesota]] where I was
+awarded my BS in 2020. I have a focus in software engineering and programming
+languages. More specifically, my academic interests lie in functional languages
+and reasoning correctness of programs.
+* Projects
+** ReachU
+A mobile application developed in [[https://flutter.dev/][Flutter]] with a [[https://www.serverless.com/][serverless]] framework in [[https://aws.amazon.com/][AWS]]
+with the goal of improving students mental health by creating a centralized
+network for events and mental health resources. If you are interested in being a
+part of a beta testing group and are a University of Minnesota student, [[mailto:joh13266@umn.edu][send me
+an email]].
+** Any Angle Path Planning
+Implemented a series of any-angle path planning algorithms in Python, comparing
+their relative times to completion and their distances to determine if a
+warehouse environment could feasibly benefit from their use over current grid
+based approaches. Code and [[https://github.com/CJohnson19/anyanglesearch/blob/master/anyanglepaper.pdf][related paper]] found [[https://github.com/CJohnson19/anyanglesearch][in my Github repo here]].
+Algorithms implemented are:
+- [[https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm][Dijkstra's Algorithm & Uniform Cost Search]]
+- [[https://en.wikipedia.org/wiki/A*_search_algorithm][A*]]
+- [[https://en.wikipedia.org/wiki/Theta*][Theta*]]
+- [[https://en.wikipedia.org/wiki/Theta*#Variants][Lazy Theta*]]
+- [[https://www.aaai.org/ocs/index.php/SOCS/SOCS13/paper/viewFile/7267/6251][Basic Link*]]
+* Professional Work
+** Graduate TA - University of Minnesota
+Graduate TA for [[http://classinfo.umn.edu/?term=1203&subject=CSCI&catalog_nbr=4131][CSCI 4131 - Internet Programming]]. Course teaches [[http://html.net/][HTML, CSS]],
+[[https://www.javascript.com/][Javascript]], and [[https://www.python.org/][Python]] for web applications.
+- Creating static and dynamic web pages.
+- Using APIs
+- Interacting with JSON
+- Introductory database design
+** Application Development Intern - Open Systems Technologies
+Assisted in developing a [[https://en.wikipedia.org/wiki/Representational_state_transfer][Rest]] based web applications with an [[https://angular.io/][Angular]] front end
+using HTML, [[https://sass-lang.com/][SASS]], and [[https://www.typescriptlang.org/][Typescript]] which communicated to a [[https://docs.microsoft.com/en-us/dotnet/csharp/][C#]] API layer. This
+layer utilized [[https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/][LINQ]] technologies to communicate with [[https://en.wikipedia.org/wiki/Relational_database][relational databases]]. All
+of the stack utilized [[https://azure.microsoft.com/en-us/][Microsoft Azure]] to create a scalable service. Notable
+contributions include:
+- Integration of [[https://www.split.io/][a feature flag system]]
+- New code coverage and testing specifications for pull request approval
+- Novel views such as pagination, filtering, and improved cross navigation
+** Undergraduate TA - University of Minnesota
+Undergraduate TA for [[https://onestop2.umn.edu/pcas/viewCatalogCourse.do?courseId=810346][CSCI 1933 - Intro to Algorithms and Data Structures]].
+Course teaches [[https://www.oracle.com/java/][Java]] and concepts such as:
+- Time complexity
+- Sorting & searching algorithms
+- Basic data structures: (e.g. stack, queue, linked list, and tree)
+- Object oriented programming
