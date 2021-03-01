@@ -11,7 +11,8 @@
 I'm pursuing my MS in Computer Science at [[https://cse.umn.edu/cs][University of Minnesota]] where I was
 awarded my BS in 2020. I have a focus in software engineering and programming
 languages. More specifically, my academic interests lie in functional languages
-and reasoning correctness of programs.
+and reasoning correctness of programs. If you're interested, I created a [[./correctness.html][short
+post]] about functional languages.
 * Projects
 ** ReachU
 [[https://www.reachuapp.com/][ReachU]] is a mobile application developed in [[https://flutter.dev/][Flutter]] with a [[https://www.serverless.com/][serverless]] framework in [[https://aws.amazon.com/][AWS]]

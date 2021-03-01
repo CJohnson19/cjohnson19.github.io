@@ -1,0 +1,3611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2021-03-01 Mon 14:57 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Functional vs Imperative</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Chase Johnson">
+<link rel="preload" as="font" crossorigin="anonymous" type="font/woff2" href="https://tecosaur.com/resources/org/etbookot-roman-webfont.woff2">
+<link rel="preload" as="font" crossorigin="anonymous" type="font/woff2" href="https://tecosaur.com/resources/org/etbookot-italic-webfont.woff2">
+<link rel="preload" as="font" crossorigin="anonymous" type="font/woff2" href="https://tecosaur.com/resources/org/Merriweather-TextRegular.woff2">
+<link rel="preload" as="font" crossorigin="anonymous" type="font/woff2" href="https://tecosaur.com/resources/org/Merriweather-TextItalic.woff2">
+<link rel="preload" as="font" crossorigin="anonymous" type="font/woff2" href="https://tecosaur.com/resources/org/Merriweather-TextBold.woff2">
+<script>
+function copyPreToClipdord(btn) {
+    const pre = btn.parentElement.parentElement.getElementsByTagName("PRE")[0];
+    const range = document.createRange();
+    range.selectNodeContents(pre);
+    range.setEnd(pre.childNodes[pre.childNodes.length-1], 0);
+    window.getSelection().addRange(range);
+    var successful = document.execCommand('copy');
+    window.getSelection().removeRange(range);
+}
+window.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+    const activate = (entry) => {
+        entry.classList.add('active');
+        if (["LI", "UL"].includes(entry.parentElement.tagName)) {
+            activate(entry.parentElement);
+        }
+    };
+    const activateLast = () => {
+        document.querySelectorAll('#text-table-of-contents li.active, #text-table-of-contents ul.active').forEach(a => {
+            a.classList.remove('active')
+        });
+        let mostRecent = { section: sections[0], bottom: -Infinity };
+        const windowHeight = window.innerHeight;
+        sections.forEach((section) => {
+            const bounds = section.getBoundingClientRect()
+            if ( bounds.bottom > mostRecent.bottom && bounds.top < windowHeight ) {
+                mostRecent = { section, bottom: bounds.bottom };
+            }
+        })
+        activate(document.querySelector(`#text-table-of-contents li a[href="#${mostRecent.section.getAttribute('id')}"]`).parentElement);
+    }
+
+    const observer = new IntersectionObserver(entries => {
+        activateLast();
+    });
+
+    sections.forEach((section) => {
+        observer.observe(section);
+    });
+});
+
+</script>
+<style>
+@charset "UTF-8";
+/*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
+/* Document
+   ========================================================================== */
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in
+ *    IE on Windows Phone and in iOS.
+ */
+html {
+  line-height: 1.15;
+  /* 1 */
+  -ms-text-size-adjust: 100%;
+  /* 2 */
+  -webkit-text-size-adjust: 100%;
+  /* 2 */ }
+
+/* Sections
+   ========================================================================== */
+/**
+ * Remove the margin in all browsers (opinionated).
+ */
+body {
+  margin: 0; }
+
+/**
+ * Add the correct display in IE 9-.
+ */
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block; }
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0; }
+
+/* Grouping content
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in IE.
+ */
+figcaption,
+figure,
+main {
+  /* 1 */
+  display: block; }
+
+/**
+ * Add the correct margin in IE 8.
+ */
+figure {
+  margin: 1em 40px; }
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+hr {
+  box-sizing: content-box;
+  /* 1 */
+  height: 0;
+  /* 1 */
+  overflow: visible;
+  /* 2 */ }
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+pre {
+  font-family: monospace, monospace;
+  /* 1 */
+  font-size: 1em;
+  /* 2 */ }
+
+/* Text-level semantics
+   ========================================================================== */
+/**
+ * 1. Remove the gray background on active links in IE 10.
+ * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.
+ */
+a {
+  background-color: transparent;
+  /* 1 */
+  -webkit-text-decoration-skip: objects;
+  /* 2 */ }
+
+/**
+ * 1. Remove the bottom border in Chrome 57- and Firefox 39-.
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+abbr[title] {
+  border-bottom: none;
+  /* 1 */
+  text-decoration: underline;
+  /* 2 */
+  text-decoration: underline dotted;
+  /* 2 */ }
+
+/**
+ * Prevent the duplicate application of `bolder` by the next rule in Safari 6.
+ */
+b,
+strong {
+  font-weight: inherit; }
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+b,
+strong {
+  font-weight: bolder; }
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+code,
+kbd,
+samp {
+  font-family: monospace, monospace;
+  /* 1 */
+  font-size: 1em;
+  /* 2 */ }
+
+/**
+ * Add the correct font style in Android 4.3-.
+ */
+dfn {
+  font-style: italic; }
+
+/**
+ * Add the correct background and color in IE 9-.
+ */
+mark {
+  background-color: #ff0;
+  color: #000; }
+
+/**
+ * Add the correct font size in all browsers.
+ */
+small {
+  font-size: 80%; }
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline; }
+
+sub {
+  bottom: -0.25em; }
+
+sup {
+  top: -0.5em; }
+
+/* Embedded content
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ */
+audio,
+video {
+  display: inline-block; }
+
+/**
+ * Add the correct display in iOS 4-7.
+ */
+audio:not([controls]) {
+  display: none;
+  height: 0; }
+
+/**
+ * Remove the border on images inside links in IE 10-.
+ */
+img {
+  border-style: none; }
+
+/**
+ * Hide the overflow in IE.
+ */
+svg:not(:root) {
+  overflow: hidden; }
+
+/* Forms
+   ========================================================================== */
+/**
+ * 1. Change the font styles in all browsers (opinionated).
+ * 2. Remove the margin in Firefox and Safari.
+ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: sans-serif;
+  /* 1 */
+  font-size: 100%;
+  /* 1 */
+  line-height: 1.15;
+  /* 1 */
+  margin: 0;
+  /* 2 */ }
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+button,
+input {
+  /* 1 */
+  overflow: visible; }
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+button,
+select {
+  /* 1 */
+  text-transform: none; }
+
+/**
+ * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
+ *    controls in Android 4.
+ * 2. Correct the inability to style clickable types in iOS and Safari.
+ */
+button,
+html [type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+  /* 2 */ }
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0; }
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText; }
+
+/**
+ * Correct the padding in Firefox.
+ */
+fieldset {
+  padding: 0.35em 0.75em 0.625em; }
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+legend {
+  box-sizing: border-box;
+  /* 1 */
+  color: inherit;
+  /* 2 */
+  display: table;
+  /* 1 */
+  max-width: 100%;
+  /* 1 */
+  padding: 0;
+  /* 3 */
+  white-space: normal;
+  /* 1 */ }
+
+/**
+ * 1. Add the correct display in IE 9-.
+ * 2. Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+progress {
+  display: inline-block;
+  /* 1 */
+  vertical-align: baseline;
+  /* 2 */ }
+
+/**
+ * Remove the default vertical scrollbar in IE.
+ */
+textarea {
+  overflow: auto; }
+
+/**
+ * 1. Add the correct box sizing in IE 10-.
+ * 2. Remove the padding in IE 10-.
+ */
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box;
+  /* 1 */
+  padding: 0;
+  /* 2 */ }
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto; }
+
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+[type="search"] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  outline-offset: -2px;
+  /* 2 */ }
+
+/**
+ * Remove the inner padding and cancel buttons in Chrome and Safari on macOS.
+ */
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none; }
+
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  /* 1 */
+  font: inherit;
+  /* 2 */ }
+
+/* Interactive
+   ========================================================================== */
+/*
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in Edge, IE, and Firefox.
+ */
+details,
+menu {
+  display: block; }
+
+/*
+ * Add the correct display in all browsers.
+ */
+summary {
+  display: list-item; }
+
+/* Scripting
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ */
+canvas {
+  display: inline-block; }
+
+/**
+ * Add the correct display in IE.
+ */
+template {
+  display: none; }
+
+/* Hidden
+   ========================================================================== */
+/**
+ * Add the correct display in IE 10-.
+ */
+[hidden] {
+  display: none; }
+
+#page {
+  --accent: #002642;
+  --accent-dark: #00151c;
+  --code-foreground: #2c3e50;
+  --code-background: #efefef;
+  --code-func: #6c3163;
+  --code-const: #4e3163;
+  --code-regex: #655370;
+  --back-white: #fff;
+  --back-light: #f0eeed;
+  --back-medium: #c8c8c8;
+  --text-light: #7b7b7b;
+  --text-gray: #444;
+  --text-medium: #222;
+  --text-dark: #000;
+  --switch-icon: "🌚";
+  --switch-shadow-color: #373d4e;
+  --switch-text: "dark mode?"; }
+
+#theme-switch:checked ~ #page {
+  --accent: #002642;
+  --accent-dark: #daf1ff;
+  --code-foreground: #a1a8ae;
+  --code-background: #222;
+  --code-func: #bd56ad;
+  --code-const: #8755ab;
+  --code-regex: #a184b3;
+  --back-white: #000;
+  --back-light: #181818;
+  --back-medium: #444;
+  --text-light: #7b7b7b;
+  --text-gray: #c8c8c8;
+  --text-medium: #ddd;
+  --text-dark: #efefef;
+  --switch-icon: "🌝";
+  --switch-shadow-color: #fce477;
+  --switch-text: "light mode?"; }
+  #theme-switch:checked ~ #page img.invertible, #theme-switch:checked ~ #page object.invertible[type="image/svg+xml"] {
+    filter: invert(90%) hue-rotate(180deg) sepia(1%); }
+
+#theme-switch {
+  display: none; }
+
+#switch-label {
+  position: fixed;
+  bottom: 4rem;
+  left: 3rem; }
+
+#switch-label::before {
+  content: var(--switch-icon);
+  font-size: 20px;
+  transition: text-shadow .2s; }
+
+#switch-label::after {
+  content: var(--switch-text);
+  color: var(--switch-shadow-color);
+  font-size: 12px;
+  visibility: hidden;
+  margin-left: 0.5em;
+  z-index: 1;
+  position: fixed;
+  bottom: calc(4rem - 25px);
+  left: calc(3rem - 10px); }
+
+@media (max-width: 1000px) {
+  #switch-label {
+    left: auto;
+    bottom: auto;
+    right: 1vw;
+    top: 1vh; }
+    #switch-label::after {
+      position: fixed;
+      top: calc(1vh + 3px);
+      right: calc(1vw + 30px);
+      left: auto;
+      bottom: auto; } }
+
+#theme-switch:focus ~ #page #switch-label::before,
+#switch-label:hover::before {
+  text-shadow: 0 0 15px var(--switch-shadow-color); }
+
+#theme-switch:focus ~ #page #switch-label::after,
+#switch-label:hover::after {
+  visibility: visible; }
+
+@font-face {
+  font-family: "Merriweather";
+  src: url("https://tecosaur.com/resources/org/Merriweather-TextRegular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: fallback; }
+
+@font-face {
+  font-family: "Merriweather";
+  src: url("https://tecosaur.com/resources/org/Merriweather-TextItalic.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+  font-display: fallback; }
+
+@font-face {
+  font-family: "Merriweather";
+  src: url("https://tecosaur.com/resources/org/Merriweather-TextBold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: fallback; }
+
+@font-face {
+  font-family: "et-book";
+  src: url("https://tecosaur.com/resources/org/etbookot-roman-webfont.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: fallback; }
+
+@font-face {
+  font-family: "et-book";
+  src: url("https://tecosaur.com/resources/org/etbookot-italic-webfont.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+  font-display: fallback; }
+
+*::selection {
+  background: var(--back-medium); }
+
+*::-moz-selection {
+  background: var(--back-medium); }
+
+.pace .pace-progress {
+  background-color: var(--accent) !important; }
+
+html, body {
+  height: 100%; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  font-family: "Merriweather"; }
+
+#page {
+  color: var(--text-dark);
+  background-color: var(--back-light);
+  transition-property: color, background-color;
+  transition-duration: 100ms; }
+
+#content, header, .page-header {
+  margin: 32px;
+  flex: 1 0 auto; }
+
+#content {
+  margin-top: 4rem;
+  min-height: calc(100vh - 4rem - 48px); }
+
+.clearfix::after {
+  clear: both; }
+
+.clearfix::before, .clearfix::after {
+  content: " ";
+  display: table; }
+
+.page-header {
+  margin-top: 80px;
+  margin-left: 0 !important; }
+  .page-header h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-transform: none; }
+    .page-header h1 .subtitle {
+      font-size: 24px;
+      color: var(--text-light);
+      margin: 0; }
+
+.page-meta {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-light); }
+
+header .site-nav {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-light);
+  font-weight: bold;
+  line-height: 2.0;
+  margin-top: 22px; }
+  header .site-nav a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 10px; }
+    header .site-nav a:hover {
+      color: var(--text-gray); }
+    header .site-nav a.active {
+      border-bottom: solid;
+      border-bottom-width: 2px; }
+  header .site-nav a:first-child {
+    margin-left: 0; }
+
+header > div {
+  display: inherit; }
+
+.site-title {
+  font-size: 16px; }
+  .site-title span {
+    display: none !important; }
+  .site-title ul {
+    display: block !important;
+    list-style: none;
+    padding: 0;
+    margin: 0; }
+    .site-title ul img {
+      border-radius: 2px;
+      max-width: 32px; }
+
+.site-header nav a {
+  color: var(--text-light);
+  font-family: "Open Sans";
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase; }
+  .site-header nav a:hover {
+    border: 0;
+    color: var(--accent); }
+
+@media (max-width: 1000px) {
+  header * {
+    display: inline; } }
+
+@media (min-width: 1000px) {
+  #content, header, .page-header {
+    max-width: 720px;
+    margin-left: 164px; }
+  header .site-title {
+    float: left; }
+  header .site-nav {
+    float: right;
+    margin-top: 0; } }
+
+@media (min-width: 2800px) {
+  #content, header, .page-header {
+    margin-left: auto;
+    margin-right: auto; } }
+
+#content .page-intro {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-gray);
+  margin-bottom: 40px; }
+
+#content p, #content li, #content dd {
+  line-height: 1.9; }
+
+#footer {
+  margin-top: 70px;
+  height: 10px;
+  background: var(--accent-dark); }
+
+.archive-item {
+  margin: 50px 0; }
+  .archive-item .archive-title {
+    font-size: 25px;
+    margin: 5px 0;
+    background: none;
+    text-shadow: none;
+    text-decoration: none; }
+    .archive-item .archive-title:hover {
+      background: none;
+      text-shadow: none;
+      text-decoration: none; }
+
+#postamble {
+  display: none; }
+
+aside, .aside {
+  background-color: var(--code-background);
+  border-radius: 5px;
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-gray);
+  margin: 20px 0;
+  padding: 20px;
+  padding-bottom: 10px;
+  line-height: 1.6 !important; }
+  aside figcaption a,
+  aside li a,
+  aside p a, .aside figcaption a,
+  .aside li a,
+  .aside p a {
+    text-shadow: 0.03em 0 var(--code-background), -0.03em 0 var(--code-background), 0 0.03em var(--code-background), 0 -0.03em var(--code-background), 0.06em 0 var(--code-background), -0.06em 0 var(--code-background), 0.09em 0 var(--code-background), -0.09em 0 var(--code-background), 0.12em 0 var(--code-background), -0.12em 0 var(--code-background), 0.15em 0 var(--code-background), -0.15em 0 var(--code-background);
+    background-image: linear-gradient(var(--text-gray), var(--text-gray));
+    background-size: 1px 1px;
+    background-repeat: repeat-x;
+    background-position: 0% 95%;
+    border-radius: 1px;
+    color: var(--text-gray);
+    text-decoration: none; }
+    aside figcaption a::selection,
+    aside li a::selection,
+    aside p a::selection, .aside figcaption a::selection,
+    .aside li a::selection,
+    .aside p a::selection {
+      text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+      background: var(--back-medium); }
+    aside figcaption a::-moz-selection,
+    aside li a::-moz-selection,
+    aside p a::-moz-selection, .aside figcaption a::-moz-selection,
+    .aside li a::-moz-selection,
+    .aside p a::-moz-selection {
+      text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+      background: var(--back-medium); }
+    aside figcaption a *,
+    aside figcaption a *:after, aside figcaption a:after,
+    aside figcaption a *:before, aside figcaption a:before,
+    aside li a *,
+    aside li a *:after,
+    aside li a:after,
+    aside li a *:before,
+    aside li a:before,
+    aside p a *,
+    aside p a *:after,
+    aside p a:after,
+    aside p a *:before,
+    aside p a:before, .aside figcaption a *,
+    .aside figcaption a *:after, .aside figcaption a:after,
+    .aside figcaption a *:before, .aside figcaption a:before,
+    .aside li a *,
+    .aside li a *:after,
+    .aside li a:after,
+    .aside li a *:before,
+    .aside li a:before,
+    .aside p a *,
+    .aside p a *:after,
+    .aside p a:after,
+    .aside p a *:before,
+    .aside p a:before {
+      text-shadow: none; }
+    aside figcaption a:visited,
+    aside li a:visited,
+    aside p a:visited, .aside figcaption a:visited,
+    .aside li a:visited,
+    .aside p a:visited {
+      color: var(--text-gray); }
+    aside figcaption a:hover,
+    aside li a:hover,
+    aside p a:hover, .aside figcaption a:hover,
+    .aside li a:hover,
+    .aside p a:hover {
+      text-shadow: 0.03em 0 var(--code-background), -0.03em 0 var(--code-background), 0 0.03em var(--code-background), 0 -0.03em var(--code-background), 0.06em 0 var(--code-background), -0.06em 0 var(--code-background), 0.09em 0 var(--code-background), -0.09em 0 var(--code-background), 0.12em 0 var(--code-background), -0.12em 0 var(--code-background), 0.15em 0 var(--code-background), -0.15em 0 var(--code-background);
+      background-image: linear-gradient(var(--text-gray), var(--text-gray));
+      background-size: 1px 1px;
+      background-repeat: repeat-x;
+      background-position: 0% 95%;
+      border-radius: 1px;
+      color: var(--text-gray);
+      text-decoration: none; }
+      aside figcaption a:hover::selection,
+      aside li a:hover::selection,
+      aside p a:hover::selection, .aside figcaption a:hover::selection,
+      .aside li a:hover::selection,
+      .aside p a:hover::selection {
+        text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+        background: var(--back-medium); }
+      aside figcaption a:hover::-moz-selection,
+      aside li a:hover::-moz-selection,
+      aside p a:hover::-moz-selection, .aside figcaption a:hover::-moz-selection,
+      .aside li a:hover::-moz-selection,
+      .aside p a:hover::-moz-selection {
+        text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+        background: var(--back-medium); }
+      aside figcaption a:hover *,
+      aside figcaption a:hover *:after, aside figcaption a:hover:after,
+      aside figcaption a:hover *:before, aside figcaption a:hover:before,
+      aside li a:hover *,
+      aside li a:hover *:after,
+      aside li a:hover:after,
+      aside li a:hover *:before,
+      aside li a:hover:before,
+      aside p a:hover *,
+      aside p a:hover *:after,
+      aside p a:hover:after,
+      aside p a:hover *:before,
+      aside p a:hover:before, .aside figcaption a:hover *,
+      .aside figcaption a:hover *:after, .aside figcaption a:hover:after,
+      .aside figcaption a:hover *:before, .aside figcaption a:hover:before,
+      .aside li a:hover *,
+      .aside li a:hover *:after,
+      .aside li a:hover:after,
+      .aside li a:hover *:before,
+      .aside li a:hover:before,
+      .aside p a:hover *,
+      .aside p a:hover *:after,
+      .aside p a:hover:after,
+      .aside p a:hover *:before,
+      .aside p a:hover:before {
+        text-shadow: none; }
+      aside figcaption a:hover:visited,
+      aside li a:hover:visited,
+      aside p a:hover:visited, .aside figcaption a:hover:visited,
+      .aside li a:hover:visited,
+      .aside p a:hover:visited {
+        color: var(--text-gray); }
+  aside p, .aside p {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray);
+    line-height: 1.6 !important; }
+  aside pre, .aside pre {
+    font-size: 12px;
+    border: none;
+    padding-left: 0; }
+
+@media (min-width: 1280px) {
+  aside, .aside {
+    float: right;
+    clear: right;
+    background-color: var(--back-white);
+    max-width: 45% !important;
+    margin-right: -52%; }
+    aside figcaption a,
+    aside li a,
+    aside p a, .aside figcaption a,
+    .aside li a,
+    .aside p a {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background-image: linear-gradient(var(--text-gray), var(--text-gray));
+      background-size: 1px 1px;
+      background-repeat: repeat-x;
+      background-position: 0% 95%;
+      border-radius: 1px;
+      color: var(--text-gray);
+      text-decoration: none; }
+      aside figcaption a::selection,
+      aside li a::selection,
+      aside p a::selection, .aside figcaption a::selection,
+      .aside li a::selection,
+      .aside p a::selection {
+        text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+        background: var(--back-medium); }
+      aside figcaption a::-moz-selection,
+      aside li a::-moz-selection,
+      aside p a::-moz-selection, .aside figcaption a::-moz-selection,
+      .aside li a::-moz-selection,
+      .aside p a::-moz-selection {
+        text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+        background: var(--back-medium); }
+      aside figcaption a *,
+      aside figcaption a *:after, aside figcaption a:after,
+      aside figcaption a *:before, aside figcaption a:before,
+      aside li a *,
+      aside li a *:after,
+      aside li a:after,
+      aside li a *:before,
+      aside li a:before,
+      aside p a *,
+      aside p a *:after,
+      aside p a:after,
+      aside p a *:before,
+      aside p a:before, .aside figcaption a *,
+      .aside figcaption a *:after, .aside figcaption a:after,
+      .aside figcaption a *:before, .aside figcaption a:before,
+      .aside li a *,
+      .aside li a *:after,
+      .aside li a:after,
+      .aside li a *:before,
+      .aside li a:before,
+      .aside p a *,
+      .aside p a *:after,
+      .aside p a:after,
+      .aside p a *:before,
+      .aside p a:before {
+        text-shadow: none; }
+      aside figcaption a:visited,
+      aside li a:visited,
+      aside p a:visited, .aside figcaption a:visited,
+      .aside li a:visited,
+      .aside p a:visited {
+        color: var(--text-gray); }
+      aside figcaption a:hover,
+      aside li a:hover,
+      aside p a:hover, .aside figcaption a:hover,
+      .aside li a:hover,
+      .aside p a:hover {
+        text-shadow: 0.03em 0 var(--back-light), -0.03em 0 var(--back-light), 0 0.03em var(--back-light), 0 -0.03em var(--back-light), 0.06em 0 var(--back-light), -0.06em 0 var(--back-light), 0.09em 0 var(--back-light), -0.09em 0 var(--back-light), 0.12em 0 var(--back-light), -0.12em 0 var(--back-light), 0.15em 0 var(--back-light), -0.15em 0 var(--back-light);
+        background-image: linear-gradient(var(--text-gray), var(--text-gray));
+        background-size: 1px 1px;
+        background-repeat: repeat-x;
+        background-position: 0% 95%;
+        border-radius: 1px;
+        color: var(--text-gray);
+        text-decoration: none; }
+        aside figcaption a:hover::selection,
+        aside li a:hover::selection,
+        aside p a:hover::selection, .aside figcaption a:hover::selection,
+        .aside li a:hover::selection,
+        .aside p a:hover::selection {
+          text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+          background: var(--back-medium); }
+        aside figcaption a:hover::-moz-selection,
+        aside li a:hover::-moz-selection,
+        aside p a:hover::-moz-selection, .aside figcaption a:hover::-moz-selection,
+        .aside li a:hover::-moz-selection,
+        .aside p a:hover::-moz-selection {
+          text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+          background: var(--back-medium); }
+        aside figcaption a:hover *,
+        aside figcaption a:hover *:after, aside figcaption a:hover:after,
+        aside figcaption a:hover *:before, aside figcaption a:hover:before,
+        aside li a:hover *,
+        aside li a:hover *:after,
+        aside li a:hover:after,
+        aside li a:hover *:before,
+        aside li a:hover:before,
+        aside p a:hover *,
+        aside p a:hover *:after,
+        aside p a:hover:after,
+        aside p a:hover *:before,
+        aside p a:hover:before, .aside figcaption a:hover *,
+        .aside figcaption a:hover *:after, .aside figcaption a:hover:after,
+        .aside figcaption a:hover *:before, .aside figcaption a:hover:before,
+        .aside li a:hover *,
+        .aside li a:hover *:after,
+        .aside li a:hover:after,
+        .aside li a:hover *:before,
+        .aside li a:hover:before,
+        .aside p a:hover *,
+        .aside p a:hover *:after,
+        .aside p a:hover:after,
+        .aside p a:hover *:before,
+        .aside p a:hover:before {
+          text-shadow: none; }
+        aside figcaption a:hover:visited,
+        aside li a:hover:visited,
+        aside p a:hover:visited, .aside figcaption a:hover:visited,
+        .aside li a:hover:visited,
+        .aside p a:hover:visited {
+          color: var(--text-gray); }
+    aside::before, .aside::before {
+      content: ''; } }
+
+blockquote {
+  border-width: 0;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: var(--back-medium);
+  margin: 20px 0;
+  padding: 0;
+  padding-left: 15px; }
+  blockquote p {
+    display: inline;
+    font-size: 13px; }
+  blockquote footer {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-light);
+    text-transform: none; }
+
+div.info {
+  background: rgba(58, 129, 195, 0.15);
+  border-left: 4px solid rgba(58, 129, 195, 0.45);
+  margin: 1.8rem 0 1.25rem 15px;
+  padding: 0.8em;
+  line-height: 1.4;
+  text-align: center;
+  position: relative;
+  clear: both; }
+  div.info p {
+    margin: 0; }
+
+div.info::before {
+  content: "i";
+  color: var(--back-white);
+  background: rgba(58, 129, 195, 0.8);
+  align-items: flex-end;
+  top: -1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  -webkit-clip-path: circle(50% at 50% 50%);
+  clip-path: circle(50% at 50% 50%);
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  justify-content: center;
+  position: absolute;
+  left: -1.2rem;
+  line-height: 1.3;
+  text-align: center; }
+
+div.success {
+  background: rgba(45, 149, 116, 0.15);
+  border-left: 4px solid rgba(45, 149, 116, 0.45);
+  margin: 1.8rem 0 1.25rem 15px;
+  padding: 0.8em;
+  line-height: 1.4;
+  text-align: center;
+  position: relative;
+  clear: both; }
+  div.success p {
+    margin: 0; }
+
+div.success::before {
+  content: "✔";
+  color: var(--back-white);
+  background: rgba(45, 149, 116, 0.8);
+  align-items: flex-end;
+  top: -1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  -webkit-clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  justify-content: center;
+  position: absolute;
+  left: -1.2rem;
+  line-height: 1.5;
+  text-align: center; }
+
+div.warning {
+  background: rgba(220, 117, 47, 0.15);
+  border-left: 4px solid rgba(220, 117, 47, 0.45);
+  margin: 1.8rem 0 1.25rem 15px;
+  padding: 0.8em;
+  line-height: 1.4;
+  text-align: center;
+  position: relative;
+  clear: both; }
+  div.warning p {
+    margin: 0; }
+
+div.warning::before {
+  content: "!";
+  color: var(--back-white);
+  background: rgba(220, 117, 47, 0.8);
+  align-items: flex-end;
+  top: -1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  -webkit-clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  justify-content: center;
+  position: absolute;
+  left: -1.2rem;
+  line-height: 1.1;
+  text-align: center; }
+
+div.error {
+  background: rgba(186, 47, 89, 0.15);
+  border-left: 4px solid rgba(186, 47, 89, 0.45);
+  margin: 1.8rem 0 1.25rem 15px;
+  padding: 0.8em;
+  line-height: 1.4;
+  text-align: center;
+  position: relative;
+  clear: both; }
+  div.error p {
+    margin: 0; }
+
+div.error::before {
+  content: "!";
+  color: var(--back-white);
+  background: rgba(186, 47, 89, 0.8);
+  align-items: flex-end;
+  top: -1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  -webkit-clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  width: 35px;
+  height: 30px;
+  display: inline-flex;
+  justify-content: center;
+  position: absolute;
+  left: -1.2rem;
+  line-height: 1.1;
+  text-align: center; }
+
+.org-ref-bib-h1 {
+  margin-top: 70px;
+  padding-top: 30px;
+  border-width: 0;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-color: var(--back-light);
+  font-family: "Open Sans";
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--text-gray); }
+
+.org-ref-bib {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-gray); }
+  .org-ref-bib li > a:nth-child(2) {
+    background: none;
+    text-shadow: none;
+    text-decoration: none; }
+    .org-ref-bib li > a:nth-child(2):hover {
+      background: none;
+      text-shadow: none;
+      text-decoration: none; }
+  .org-ref-bib .bib-link {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-light);
+    background: none;
+    text-shadow: none;
+    text-decoration: none; }
+
+pre.src, pre.example {
+  border-width: 0;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: var(--back-medium);
+  margin: 20px 0;
+  padding: 0;
+  padding-left: 15px;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.9;
+  overflow-x: visible;
+  box-shadow: none;
+  white-space: pre-wrap;
+  position: relative; }
+
+pre.example {
+  border-left-style: dotted;
+  border-left-width: 2px; }
+
+pre.src::before {
+  display: inline-block;
+  position: absolute;
+  background-color: transparent;
+  top: unset;
+  bottom: -16px;
+  left: 20px;
+  padding: 0px;
+  border: none;
+  font-size: 80%;
+  font-style: italic;
+  color: var(--text-light); }
+
+pre.src:empty {
+  display: none; }
+
+code {
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  color: var(--code-foreground);
+  font-size: 15px;
+  padding: 0 5px; }
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 80% SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+  line-height: normal;
+  line-height: 80%;
+  color: var(--text-gray);
+  vertical-align: middle;
+  background-color: var(--back-light);
+  border: 1px solid #91959a88;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #91959a88; }
+
+li code {
+  font-size: 14px; }
+
+li p code {
+  font-size: 15px; }
+
+details.code {
+  position: relative; }
+  details.code summary {
+    position: relative;
+    left: -3px;
+    padding-left: 10px;
+    padding-bottom: 4px;
+    margin-left: -10px;
+    z-index: 1;
+    outline: none;
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-light); }
+    details.code summary .name {
+      font-size: 14px;
+      color: var(--text-medium);
+      margin-right: 0.7em; }
+    details.code summary .lang {
+      font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+      font-style: italic; }
+  details.code summary::marker {
+    color: var(--back-medium); }
+  details.code[open] summary {
+    margin-bottom: -32px; }
+    details.code[open] summary .lang {
+      display: none; }
+  details.code[open] summary.named {
+    margin-bottom: -26px; }
+  details.code:not([open]) summary {
+    margin-bottom: -5px; }
+
+p + details.code {
+  margin-top: -20px; }
+
+li p + details.code {
+  margin-top: -5px; }
+
+.example,
+.src {
+  color: var(--code-foreground); }
+  .example .org-keyword,
+  .src .org-keyword {
+    color: #3a81c3; }
+  .example .org-variable-name,
+  .src .org-variable-name {
+    color: #715ab1; }
+  .example .org-rainbow-delimiters-depth-1,
+  .example .org-rainbow-delimiters-depth-2,
+  .example .org-rainbow-delimiters-depth-3,
+  .example .org-rainbow-delimiters-depth-4,
+  .example .org-rainbow-delimiters-depth-5,
+  .example .org-rainbow-delimiters-depth-6,
+  .example .org-rainbow-delimiters-depth-7,
+  .example .org-rainbow-delimiters-depth-8,
+  .example .org-rainbow-delimiters-depth-9,
+  .src .org-rainbow-delimiters-depth-1,
+  .src .org-rainbow-delimiters-depth-2,
+  .src .org-rainbow-delimiters-depth-3,
+  .src .org-rainbow-delimiters-depth-4,
+  .src .org-rainbow-delimiters-depth-5,
+  .src .org-rainbow-delimiters-depth-6,
+  .src .org-rainbow-delimiters-depth-7,
+  .src .org-rainbow-delimiters-depth-8,
+  .src .org-rainbow-delimiters-depth-9 {
+    color: #555555; }
+  .example .org-string,
+  .src .org-string {
+    color: #2d9574; }
+  .example .org-comment,
+  .example .org-comment-delimiter,
+  .src .org-comment,
+  .src .org-comment-delimiter {
+    color: #555555; }
+  .example .org-function-name,
+  .src .org-function-name {
+    color: var(--code-func); }
+  .example .org-constant,
+  .example .org-highlight-numbers-number,
+  .src .org-constant,
+  .src .org-highlight-numbers-number {
+    color: var(--code-const); }
+
+.gutter {
+  position: absolute;
+  top: 0;
+  left: -2.5rem;
+  width: 2rem;
+  padding-right: 0.3rem;
+  padding-top: 5px;
+  height: calc(100% - 10px);
+  z-index: 1;
+  transition: opacity 200ms;
+  opacity: 0;
+  font-size: 15px; }
+  .gutter:hover {
+    opacity: 1; }
+  .gutter * {
+    display: block;
+    width: 100%;
+    text-align: right;
+    padding: 0;
+    margin: 0;
+    color: var(--text-light); }
+    .gutter *:hover {
+      color: var(--text-gray); }
+    .gutter *:active {
+      font-weight: bold; }
+  .gutter a {
+    text-decoration: none;
+    font-size: 110%; }
+  .gutter button {
+    background: none;
+    border: none; }
+
+/* Languages per Org manual */
+pre.src-asymptote::before {
+  content: 'Asymptote'; }
+
+pre.src-authinfo::before {
+  content: 'Authinfo'; }
+
+pre.src-awk::before {
+  content: 'Awk'; }
+
+pre.src-C::before {
+  content: 'C'; }
+
+/* pre.src-C++ doesn't work in CSS */
+pre.src-clojure::before {
+  content: 'Clojure'; }
+
+pre.src-css::before {
+  content: 'CSS'; }
+
+pre.src-D::before {
+  content: 'D'; }
+
+pre.src-ditaa::before {
+  content: 'ditaa'; }
+
+pre.src-dot::before {
+  content: 'Graphviz'; }
+
+pre.src-calc::before {
+  content: 'Emacs Calc'; }
+
+pre.src-emacs-lisp::before {
+  content: 'Emacs Lisp'; }
+
+pre.src-fortran::before {
+  content: 'Fortran'; }
+
+pre.src-gnuplot::before {
+  content: 'gnuplot'; }
+
+pre.src-haskell::before {
+  content: 'Haskell'; }
+
+pre.src-hledger::before {
+  content: 'hledger'; }
+
+pre.src-java::before {
+  content: 'Java'; }
+
+pre.src-js::before {
+  content: 'Javascript'; }
+
+pre.src-latex::before {
+  content: 'LaTeX'; }
+
+pre.src-ledger::before {
+  content: 'Ledger'; }
+
+pre.src-lisp::before {
+  content: 'Lisp'; }
+
+pre.src-lilypond::before {
+  content: 'Lilypond'; }
+
+pre.src-lua::before {
+  content: 'Lua'; }
+
+pre.src-matlab::before {
+  content: 'MATLAB'; }
+
+pre.src-mscgen::before {
+  content: 'Mscgen'; }
+
+pre.src-ocaml::before {
+  content: 'Objective Caml'; }
+
+pre.src-octave::before {
+  content: 'Octave'; }
+
+pre.src-org::before {
+  content: 'Org mode'; }
+
+pre.src-oz::before {
+  content: 'OZ'; }
+
+pre.src-plantuml::before {
+  content: 'Plantuml'; }
+
+pre.src-processing::before {
+  content: 'Processing.js'; }
+
+pre.src-python::before {
+  content: 'Python'; }
+
+pre.src-R::before {
+  content: 'R'; }
+
+pre.src-ruby::before {
+  content: 'Ruby'; }
+
+pre.src-sass::before {
+  content: 'Sass'; }
+
+pre.src-scheme::before {
+  content: 'Scheme'; }
+
+pre.src-screen::before {
+  content: 'Gnu Screen'; }
+
+pre.src-sed::before {
+  content: 'Sed'; }
+
+pre.src-sh::before {
+  content: 'shell'; }
+
+pre.src-sql::before {
+  content: 'SQL'; }
+
+pre.src-sqlite::before {
+  content: 'SQLite'; }
+
+/* additional languages in org.el's org-babel-load-languages alist */
+pre.src-forth::before {
+  content: 'Forth'; }
+
+pre.src-io::before {
+  content: 'IO'; }
+
+pre.src-J::before {
+  content: 'J'; }
+
+pre.src-makefile::before {
+  content: 'Makefile'; }
+
+pre.src-maxima::before {
+  content: 'Maxima'; }
+
+pre.src-perl::before {
+  content: 'Perl'; }
+
+pre.src-picolisp::before {
+  content: 'Pico Lisp'; }
+
+pre.src-scala::before {
+  content: 'Scala'; }
+
+pre.src-shell::before {
+  content: 'Shell Script'; }
+
+pre.src-systemd::before {
+  content: 'Systemd'; }
+
+pre.src-ebnf2ps::before {
+  content: 'ebfn2ps'; }
+
+/* additional language identifiers per \"defun org-babel-execute\"
+      in ob-*.el */
+pre.src-cpp::before {
+  content: 'C++'; }
+
+pre.src-abc::before {
+  content: 'ABC'; }
+
+pre.src-coq::before {
+  content: 'Coq'; }
+
+pre.src-groovy::before {
+  content: 'Groovy'; }
+
+/* additional language identifiers from org-babel-shell-names in
+    ob-shell.el: ob-shell is the only babel language using a lambda to put
+    the execution function name together. */
+pre.src-bash::before {
+  content: 'bash'; }
+
+pre.src-csh::before {
+  content: 'csh'; }
+
+pre.src-ash::before {
+  content: 'ash'; }
+
+pre.src-dash::before {
+  content: 'dash'; }
+
+pre.src-ksh::before {
+  content: 'ksh'; }
+
+pre.src-mksh::before {
+  content: 'mksh'; }
+
+pre.src-posh::before {
+  content: 'posh'; }
+
+/* Additional Emacs modes also supported by the LaTeX listings package */
+pre.src-ada::before {
+  content: 'Ada'; }
+
+pre.src-asm::before {
+  content: 'Assembler'; }
+
+pre.src-caml::before {
+  content: 'Caml'; }
+
+pre.src-delphi::before {
+  content: 'Delphi'; }
+
+pre.src-html::before {
+  content: 'HTML'; }
+
+pre.src-idl::before {
+  content: 'IDL'; }
+
+pre.src-mercury::before {
+  content: 'Mercury'; }
+
+pre.src-metapost::before {
+  content: 'MetaPost'; }
+
+pre.src-modula-2::before {
+  content: 'Modula-2'; }
+
+pre.src-pascal::before {
+  content: 'Pascal'; }
+
+pre.src-ps::before {
+  content: 'PostScript'; }
+
+pre.src-prolog::before {
+  content: 'Prolog'; }
+
+pre.src-simula::before {
+  content: 'Simula'; }
+
+pre.src-tcl::before {
+  content: 'tcl'; }
+
+pre.src-tex::before {
+  content: 'LaTeX'; }
+
+pre.src-plain-tex::before {
+  content: 'TeX'; }
+
+pre.src-verilog::before {
+  content: 'Verilog'; }
+
+pre.src-vhdl::before {
+  content: 'VHDL'; }
+
+pre.src-xml::before {
+  content: 'XML'; }
+
+pre.src-nxml::before {
+  content: 'XML'; }
+
+pre.src-conf::before {
+  content: 'Configuration File'; }
+
+.dropcap {
+  float: left;
+  font-size: 55px;
+  font-style: normal;
+  line-height: .1;
+  margin-right: 0.2em;
+  margin-top: 0.5em;
+  padding: 0; }
+
+figure {
+  text-align: center; }
+  figure figcaption {
+    margin-top: 10px;
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray); }
+    figure figcaption .figure-number {
+      font-family: "Open Sans";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 12px;
+      line-height: 1.9;
+      color: var(--text-light); }
+
+img.zoomTarget:hover {
+  cursor: default !important; }
+
+img, object[type="image/svg+xml"] {
+  filter: invert(7%) sepia(4%);
+  max-width: 100%; }
+
+.org-svg {
+  width: 90%; }
+
+#footnotes {
+  margin-top: 70px;
+  padding-top: 30px;
+  border-width: 0;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-color: var(--back-light);
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-gray); }
+  #footnotes p, #footnotes li {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray); }
+  #footnotes h2.footnotes {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-family: "Open Sans";
+    font-size: 18px;
+    letter-spacing: 5px;
+    display: none; }
+  #footnotes .footnum {
+    color: var(--text-dark); }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "et-book";
+  font-weight: normal;
+  margin-bottom: 0;
+  margin-top: 60px; }
+
+h1 > a[aria-hidden='true'],
+h2 > a[aria-hidden='true'],
+h3 > a[aria-hidden='true'],
+h4 > a[aria-hidden='true'],
+h5 > a[aria-hidden='true'],
+h6 > a[aria-hidden='true'] {
+  color: var(--back-medium);
+  position: relative;
+  top: 0.06em;
+  line-height: 1;
+  font-size: 110%;
+  padding-left: 0.2em;
+  text-decoration: none;
+  visibility: hidden; }
+
+h1 > a[aria-hidden='true']:hover,
+h2 > a[aria-hidden='true']:hover,
+h3 > a[aria-hidden='true']:hover,
+h4 > a[aria-hidden='true']:hover,
+h5 > a[aria-hidden='true']:hover,
+h6 > a[aria-hidden='true']:hover {
+  color: var(--text-light); }
+
+h1:hover > a[aria-hidden='true'],
+h2:hover > a[aria-hidden='true'],
+h3:hover > a[aria-hidden='true'],
+h4:hover > a[aria-hidden='true'],
+h5:hover > a[aria-hidden='true'],
+h6:hover > a[aria-hidden='true'] {
+  visibility: visible; }
+
+h1, h2, h3, h4, h5, h6 {
+  padding-left: 30px;
+  margin-left: -30px;
+  position: relative; }
+
+h1, .section-number-1 {
+  font-size: 40px; }
+
+h2, .section-number-2 {
+  font-size: 30px; }
+
+h3, .section-number-3 {
+  font-size: 24px; }
+
+h4, .section-number-4 {
+  font-size: 20px;
+  font-style: italic; }
+
+h5 {
+  font-size: 20px;
+  font-variant: small-caps; }
+
+.section-number-5 {
+  font-size: 20px; }
+
+h6 {
+  font-size: 18px;
+  font-style: italic; }
+
+.section-number-6 {
+  font-size: 18px; }
+
+.section-number-1,
+.section-number-2,
+.section-number-3,
+.section-number-4,
+.section-number-5,
+.section-number-6 {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-light);
+  font-size: inherit;
+  color: var(--text-light);
+  line-height: 1; }
+  @media (min-width: 1000px) {
+    .section-number-1,
+    .section-number-2,
+    .section-number-3,
+    .section-number-4,
+    .section-number-5,
+    .section-number-6 {
+      position: absolute;
+      transform: translateX(-100%) translateX(-10px); } }
+.outline-text-2:empty + .outline-3 > h3, .outline-text-2:-moz-only-whitespace + .outline-3 > h3 {
+  margin-top: 20px; }
+
+.outline-text-3:empty + .outline-4 > h4, .outline-text-3:-moz-only-whitespace + .outline-4 > h4 {
+  margin-top: 15px; }
+
+.outline-text-4:empty + .outline-5 > h5, .outline-text-4:-moz-only-whitespace + .outline-5 > h5 {
+  margin-top: 15px; }
+
+.outline-text-5:empty + .outline-6 > h6, .outline-text-5:-moz-only-whitespace + .outline-6 > h6 {
+  margin-top: 10px; }
+
+hr {
+  border: none;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: var(--back-medium);
+  margin-bottom: 30px;
+  margin-top: 40px; }
+
+#breadcrumbs a,
+figcaption a,
+p a,
+.page-tags a,
+table a,
+#crosslinks a:not(.highlight),
+li a,
+dl a {
+  text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+  background-image: linear-gradient(var(--text-dark), var(--text-dark));
+  background-size: 1px 1px;
+  background-repeat: repeat-x;
+  background-position: 0% 95%;
+  border-radius: 1px;
+  color: var(--text-dark);
+  text-decoration: none;
+  text-shadow: none; }
+  #breadcrumbs a::selection,
+  figcaption a::selection,
+  p a::selection,
+  .page-tags a::selection,
+  table a::selection,
+  #crosslinks a:not(.highlight)::selection,
+  li a::selection,
+  dl a::selection {
+    text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+    background: var(--back-medium); }
+  #breadcrumbs a::-moz-selection,
+  figcaption a::-moz-selection,
+  p a::-moz-selection,
+  .page-tags a::-moz-selection,
+  table a::-moz-selection,
+  #crosslinks a:not(.highlight)::-moz-selection,
+  li a::-moz-selection,
+  dl a::-moz-selection {
+    text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+    background: var(--back-medium); }
+  #breadcrumbs a *,
+  #breadcrumbs a *:after, #breadcrumbs a:after,
+  #breadcrumbs a *:before, #breadcrumbs a:before,
+  figcaption a *,
+  figcaption a *:after,
+  figcaption a:after,
+  figcaption a *:before,
+  figcaption a:before,
+  p a *,
+  p a *:after,
+  p a:after,
+  p a *:before,
+  p a:before,
+  .page-tags a *,
+  .page-tags a *:after,
+  .page-tags a:after,
+  .page-tags a *:before,
+  .page-tags a:before,
+  table a *,
+  table a *:after,
+  table a:after,
+  table a *:before,
+  table a:before,
+  #crosslinks a:not(.highlight) *,
+  #crosslinks a:not(.highlight) *:after,
+  #crosslinks a:not(.highlight):after,
+  #crosslinks a:not(.highlight) *:before,
+  #crosslinks a:not(.highlight):before,
+  li a *,
+  li a *:after,
+  li a:after,
+  li a *:before,
+  li a:before,
+  dl a *,
+  dl a *:after,
+  dl a:after,
+  dl a *:before,
+  dl a:before {
+    text-shadow: none; }
+  #breadcrumbs a:visited,
+  figcaption a:visited,
+  p a:visited,
+  .page-tags a:visited,
+  table a:visited,
+  #crosslinks a:not(.highlight):visited,
+  li a:visited,
+  dl a:visited {
+    color: var(--text-dark); }
+  #breadcrumbs a:hover,
+  figcaption a:hover,
+  p a:hover,
+  .page-tags a:hover,
+  table a:hover,
+  #crosslinks a:not(.highlight):hover,
+  li a:hover,
+  dl a:hover {
+    text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+    background-image: linear-gradient(var(--text-dark), var(--text-dark));
+    background-size: 1px 1px;
+    background-repeat: repeat-x;
+    background-position: 0% 95%;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg id='squiggle-link' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:ev='http://www.w3.org/2001/xml-events' viewBox='0 0 20 4'%3E%3Cstyle type='text/css'%3E.squiggle{animation:shift .3s linear infinite;}@keyframes shift {from {transform:translateX(0);}to {transform:translateX(-20px);}}%3C/style%3E%3Cpath fill='none' stroke='%23000000' stroke-width='2' class='squiggle' d='M0,3.5 c 5,0,5,-3,10,-3 s 5,3,10,3 c 5,0,5,-3,10,-3 s 5,3,10,3'/%3E%3C/svg%3E");
+    background-position: 0% 100%;
+    background-size: 0.8em auto;
+    text-decoration: none; }
+    #breadcrumbs a:hover::selection,
+    figcaption a:hover::selection,
+    p a:hover::selection,
+    .page-tags a:hover::selection,
+    table a:hover::selection,
+    #crosslinks a:not(.highlight):hover::selection,
+    li a:hover::selection,
+    dl a:hover::selection {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background: var(--back-white); }
+    #breadcrumbs a:hover::-moz-selection,
+    figcaption a:hover::-moz-selection,
+    p a:hover::-moz-selection,
+    .page-tags a:hover::-moz-selection,
+    table a:hover::-moz-selection,
+    #crosslinks a:not(.highlight):hover::-moz-selection,
+    li a:hover::-moz-selection,
+    dl a:hover::-moz-selection {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background: var(--back-white); }
+  #breadcrumbs a[href^="#"],
+  figcaption a[href^="#"],
+  p a[href^="#"],
+  .page-tags a[href^="#"],
+  table a[href^="#"],
+  #crosslinks a[href^="#"]:not(.highlight),
+  li a[href^="#"],
+  dl a[href^="#"] {
+    text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+    background-image: linear-gradient(var(--text-gray), var(--text-gray));
+    background-size: 1px 1px;
+    background-repeat: repeat-x;
+    background-position: 0% 95%;
+    text-shadow: none; }
+    #breadcrumbs a[href^="#"]::selection,
+    figcaption a[href^="#"]::selection,
+    p a[href^="#"]::selection,
+    .page-tags a[href^="#"]::selection,
+    table a[href^="#"]::selection,
+    #crosslinks a[href^="#"]:not(.highlight)::selection,
+    li a[href^="#"]::selection,
+    dl a[href^="#"]::selection {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background: var(--back-white); }
+    #breadcrumbs a[href^="#"]::-moz-selection,
+    figcaption a[href^="#"]::-moz-selection,
+    p a[href^="#"]::-moz-selection,
+    .page-tags a[href^="#"]::-moz-selection,
+    table a[href^="#"]::-moz-selection,
+    #crosslinks a[href^="#"]:not(.highlight)::-moz-selection,
+    li a[href^="#"]::-moz-selection,
+    dl a[href^="#"]::-moz-selection {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background: var(--back-white); }
+    #breadcrumbs a[href^="#"]:hover,
+    figcaption a[href^="#"]:hover,
+    p a[href^="#"]:hover,
+    .page-tags a[href^="#"]:hover,
+    table a[href^="#"]:hover,
+    #crosslinks a[href^="#"]:not(.highlight):hover,
+    li a[href^="#"]:hover,
+    dl a[href^="#"]:hover {
+      text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+      background-image: linear-gradient(var(--text-medium), var(--text-medium));
+      background-size: 1px 1px;
+      background-repeat: repeat-x;
+      background-position: 0% 95%; }
+      #breadcrumbs a[href^="#"]:hover::selection,
+      figcaption a[href^="#"]:hover::selection,
+      p a[href^="#"]:hover::selection,
+      .page-tags a[href^="#"]:hover::selection,
+      table a[href^="#"]:hover::selection,
+      #crosslinks a[href^="#"]:not(.highlight):hover::selection,
+      li a[href^="#"]:hover::selection,
+      dl a[href^="#"]:hover::selection {
+        text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+        background: var(--back-white); }
+      #breadcrumbs a[href^="#"]:hover::-moz-selection,
+      figcaption a[href^="#"]:hover::-moz-selection,
+      p a[href^="#"]:hover::-moz-selection,
+      .page-tags a[href^="#"]:hover::-moz-selection,
+      table a[href^="#"]:hover::-moz-selection,
+      #crosslinks a[href^="#"]:not(.highlight):hover::-moz-selection,
+      li a[href^="#"]:hover::-moz-selection,
+      dl a[href^="#"]:hover::-moz-selection {
+        text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+        background: var(--back-white); }
+
+#theme-switch:checked ~ #page #breadcrumbs a:hover,
+#theme-switch:checked ~ #page figcaption a:hover,
+#theme-switch:checked ~ #page p a:hover,
+#theme-switch:checked ~ #page .page-tags a:hover,
+#theme-switch:checked ~ #page table a:hover,
+#theme-switch:checked ~ #page #crosslinks a:not(.highlight):hover,
+#theme-switch:checked ~ #page li a:hover,
+#theme-switch:checked ~ #page dl a:hover {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg id='squiggle-link' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:ev='http://www.w3.org/2001/xml-events' viewBox='0 0 20 4'%3E%3Cstyle type='text/css'%3E.squiggle{animation:shift .3s linear infinite;}@keyframes shift {from {transform:translateX(0);}to {transform:translateX(-20px);}}%3C/style%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='2' class='squiggle' d='M0,3.5 c 5,0,5,-3,10,-3 s 5,3,10,3 c 5,0,5,-3,10,-3 s 5,3,10,3'/%3E%3C/svg%3E"); }
+
+*:target::before {
+  content: "🠖";
+  position: absolute;
+  left: -7rem;
+  top: calc(0.5em - 2rem);
+  line-height: 1;
+  color: #e65353aa;
+  font-size: 3rem;
+  font-style: normal; }
+  @media (max-width: 1000px) {
+    *:target::before {
+      content: "🠔";
+      left: unset;
+      right: 0; } }
+#content .page-intro p a,
+#footnotes a {
+  text-shadow: 0.03em 0 var(--back-white), -0.03em 0 var(--back-white), 0 0.03em var(--back-white), 0 -0.03em var(--back-white), 0.06em 0 var(--back-white), -0.06em 0 var(--back-white), 0.09em 0 var(--back-white), -0.09em 0 var(--back-white), 0.12em 0 var(--back-white), -0.12em 0 var(--back-white), 0.15em 0 var(--back-white), -0.15em 0 var(--back-white);
+  background-image: linear-gradient(var(--text-gray), var(--text-gray));
+  background-size: 1px 1px;
+  background-repeat: repeat-x;
+  background-position: 0% 95%;
+  border-radius: 1px;
+  color: var(--text-gray);
+  text-decoration: none; }
+  #content .page-intro p a::selection,
+  #footnotes a::selection {
+    text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+    background: var(--back-medium); }
+  #content .page-intro p a::-moz-selection,
+  #footnotes a::-moz-selection {
+    text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+    background: var(--back-medium); }
+  #content .page-intro p a *,
+  #content .page-intro p a *:after, #content .page-intro p a:after,
+  #content .page-intro p a *:before, #content .page-intro p a:before,
+  #footnotes a *,
+  #footnotes a *:after,
+  #footnotes a:after,
+  #footnotes a *:before,
+  #footnotes a:before {
+    text-shadow: none; }
+  #content .page-intro p a:visited,
+  #footnotes a:visited {
+    color: var(--text-gray); }
+  #content .page-intro p a:hover,
+  #footnotes a:hover {
+    text-shadow: 0.03em 0 var(--back-light), -0.03em 0 var(--back-light), 0 0.03em var(--back-light), 0 -0.03em var(--back-light), 0.06em 0 var(--back-light), -0.06em 0 var(--back-light), 0.09em 0 var(--back-light), -0.09em 0 var(--back-light), 0.12em 0 var(--back-light), -0.12em 0 var(--back-light), 0.15em 0 var(--back-light), -0.15em 0 var(--back-light);
+    background-image: linear-gradient(var(--text-gray), var(--text-gray));
+    background-size: 1px 1px;
+    background-repeat: repeat-x;
+    background-position: 0% 95%;
+    border-radius: 1px;
+    color: var(--text-gray);
+    text-decoration: none; }
+    #content .page-intro p a:hover::selection,
+    #footnotes a:hover::selection {
+      text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+      background: var(--back-medium); }
+    #content .page-intro p a:hover::-moz-selection,
+    #footnotes a:hover::-moz-selection {
+      text-shadow: 0.03em 0 var(--back-medium), -0.03em 0 var(--back-medium), 0 0.03em var(--back-medium), 0 -0.03em var(--back-medium), 0.06em 0 var(--back-medium), -0.06em 0 var(--back-medium), 0.09em 0 var(--back-medium), -0.09em 0 var(--back-medium), 0.12em 0 var(--back-medium), -0.12em 0 var(--back-medium), 0.15em 0 var(--back-medium), -0.15em 0 var(--back-medium);
+      background: var(--back-medium); }
+    #content .page-intro p a:hover *,
+    #content .page-intro p a:hover *:after, #content .page-intro p a:hover:after,
+    #content .page-intro p a:hover *:before, #content .page-intro p a:hover:before,
+    #footnotes a:hover *,
+    #footnotes a:hover *:after,
+    #footnotes a:hover:after,
+    #footnotes a:hover *:before,
+    #footnotes a:hover:before {
+      text-shadow: none; }
+    #content .page-intro p a:hover:visited,
+    #footnotes a:hover:visited {
+      color: var(--text-gray); }
+
+.pile-link::before {
+  background-color: var(--back-white);
+  content: "‹\00a0"; }
+
+.pile-link::after {
+  background-color: var(--back-white);
+  content: "\00a0›"; }
+
+#crosslinks {
+  margin-top: 20px; }
+  #crosslinks a:not(.highlight) {
+    padding: 0.1em 0.2em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--back-light);
+    border-radius: 1px;
+    font-family: "Open Sans";
+    font-variant: all-small-caps;
+    font-size: max(0.4em, 10px);
+    font-style: normal;
+    letter-spacing: 2px;
+    background-image: none;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 0.1em 0.5em;
+    background-color: var(--back-white); }
+    #crosslinks a:not(.highlight):hover {
+      background-color: var(--back-light);
+      background-image: none; }
+    #crosslinks a:not(.highlight):not(.active) {
+      border-color: var(--back-white); }
+    #crosslinks a.active:not(.highlight) {
+      text-shadow: none;
+      text-decoration: none;
+      color: var(--back-white);
+      background-color: var(--code-foreground); }
+      #crosslinks a.active:not(.highlight):hover {
+        background-color: var(--back-light);
+        background-image: none;
+        color: var(--text-dark); }
+
+.btn {
+  padding: 7px 14px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--back-light);
+  border-radius: 1px;
+  font-family: "Open Sans";
+  font-variant: all-small-caps;
+  font-size: 14px;
+  font-style: normal;
+  letter-spacing: 2px;
+  background-image: none;
+  cursor: pointer; }
+  .btn:hover {
+    background-color: var(--back-light);
+    background-image: none; }
+
+.btn.disabled {
+  color: var(--text-light); }
+  .btn.disabled:hover {
+    cursor: default; }
+
+.btn.small {
+  padding: 3px 6px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--back-light);
+  border-radius: 1px;
+  font-family: "Open Sans";
+  font-variant: all-small-caps;
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 2px;
+  background-image: none;
+  padding-right: 9px;
+  padding-left: 9px; }
+  .btn.small:hover {
+    background-color: var(--back-light);
+    background-image: none; }
+
+.btn.highlight {
+  text-shadow: none;
+  text-decoration: none;
+  color: var(--text-dark);
+  background-color: yellow; }
+
+.btn.primary {
+  text-shadow: none;
+  text-decoration: none;
+  color: var(--back-white);
+  background-color: var(--accent); }
+  .btn.primary:hover {
+    background-color: var(--back-light);
+    background-image: none;
+    color: var(--text-dark); }
+
+.image-link, .image-link:hover {
+  background: none;
+  text-shadow: none;
+  text-decoration: none; }
+
+ul, ol, dl {
+  list-style: none;
+  list-style-position: outside;
+  padding: 0; }
+  ul li::before, ul dt::before, ol li::before, ol dt::before, dl li::before, dl dt::before {
+    display: inline-block;
+    width: 1em;
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray); }
+  ul li, ol li, dl li {
+    margin: 5px 0;
+    font-size: 14px; }
+    ul li p, ol li p, dl li p {
+      font-size: 15px; }
+
+ul li::before {
+  content: "•";
+  margin-left: -1em; }
+
+ol {
+  counter-reset: li; }
+  ol li::before {
+    content: counter(li);
+    margin-left: -1.5em;
+    margin-right: 0.5em;
+    text-align: right;
+    direction: rtl; }
+  ol li {
+    counter-increment: li; }
+
+ul ul, ol ol {
+  padding-left: 20px; }
+
+ul ul ul, ol ol ol {
+  padding-left: 30px; }
+
+li p:first-child {
+  display: inline-block;
+  margin-bottom: 0; }
+
+dl dt::before {
+  content: "•";
+  margin-left: -1em; }
+
+dl dt {
+  font-weight: normal;
+  margin-bottom: 10px; }
+
+dl dd {
+  font-style: italic;
+  margin-bottom: 20px; }
+
+li .checkbox {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  border-radius: 3px;
+  margin: 3px;
+  top: 4px;
+  position: relative; }
+
+li.on > .checkbox {
+  background: #2d9574;
+  box-shadow: 0 0 2px #2d9574; }
+
+li.trans > .checkbox {
+  background: #dc752f;
+  box-shadow: 0 0 2px #dc752f; }
+
+li.off > .checkbox {
+  background: #ba2f59;
+  box-shadow: 0 0 2px #ba2f59;
+  top: 6px; }
+
+li.on > .checkbox::after {
+  content: '';
+  height: 0.45em;
+  width: 0.225em;
+  -webkit-transform-origin: left top;
+  transform-origin: left top;
+  transform: scaleX(-1) rotate(135deg);
+  border-right: 2.8px solid #fff;
+  border-top: 2.8px solid #fff;
+  opacity: 0.9;
+  left: 0.10em;
+  top: 0.45em;
+  position: absolute; }
+
+li.trans > .checkbox::after {
+  content: '';
+  font-weight: bold;
+  font-size: 1.6em;
+  position: absolute;
+  top: 0.2em;
+  left: 0.11em;
+  width: 0.35em;
+  height: 0.12em;
+  background: #fff;
+  opacity: 0.9;
+  border-radius: 0.1em; }
+
+li.off > .checkbox::after {
+  content: '✖';
+  color: #fff;
+  opacity: 0.9;
+  position: relative;
+  top: -0.50rem;
+  left: 0.17em;
+  font-size: 0.75em; }
+
+#org-div-home-and-up {
+  display: none !important; }
+
+.outline-2 h2 {
+  font-size: 30px; }
+
+.outline-3 h3 {
+  font-size: 24px;
+  font-style: normal; }
+
+.outline-2 .section-number-2 {
+  font-size: 30px; }
+
+.outline-3 .section-number-3 {
+  font-size: 24px; }
+
+.timestamp, .timestamp-kwd {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-light);
+  background-color: var(--back-white);
+  border-radius: 1px; }
+
+.todo, .done {
+  padding: 0.1em 0.2em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--back-light);
+  border-radius: 1px;
+  font-family: "Open Sans";
+  font-variant: all-small-caps;
+  font-size: max(0.4em, 10px);
+  font-style: normal;
+  letter-spacing: 2px;
+  background-image: none;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 0.1em 0.5em;
+  background-color: var(--back-white);
+  background-color: transparent;
+  border: none;
+  font-weight: bold; }
+  .todo:hover, .done:hover {
+    background-color: var(--back-light);
+    background-image: none; }
+  .todo:not(.active), .done:not(.active) {
+    border-color: var(--back-white); }
+  .todo.active, .done.active {
+    text-shadow: none;
+    text-decoration: none;
+    color: var(--back-white);
+    background-color: var(--code-foreground); }
+    .todo.active:hover, .done.active:hover {
+      background-color: var(--back-light);
+      background-image: none;
+      color: var(--text-dark); }
+
+.outline-2, .outline-3, .outline-4 {
+  contain: layout; }
+  .outline-2 .todo, .outline-2 .done, .outline-3 .todo, .outline-3 .done, .outline-4 .todo, .outline-4 .done {
+    font-size: 18px; }
+
+.todo {
+  color: #ee3333; }
+
+.done {
+  color: var(--text-light); }
+
+.tag > span {
+  padding: 0.1em 0.2em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--back-light);
+  border-radius: 1px;
+  font-family: "Open Sans";
+  font-variant: all-small-caps;
+  font-size: max(0.4em, 10px);
+  font-style: normal;
+  letter-spacing: 2px;
+  background-image: none;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 0.1em 0.5em;
+  background-color: var(--back-white);
+  border-radius: 100px; }
+  .tag > span:hover {
+    background-color: var(--back-light);
+    background-image: none; }
+  .tag > span:not(.active) {
+    border-color: var(--back-white); }
+  .tag > span.active {
+    text-shadow: none;
+    text-decoration: none;
+    color: var(--back-white);
+    background-color: var(--code-foreground); }
+    .tag > span.active:hover {
+      background-color: var(--back-light);
+      background-image: none;
+      color: var(--text-dark); }
+
+.priority {
+  color: var(--text-light);
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace; }
+
+.footref {
+  text-shadow: none; }
+
+.footpara {
+  display: inline; }
+
+.footdef:last-of-type {
+  margin-bottom: 1em; }
+
+th.org-right {
+  text-align: center; }
+
+th.org-left {
+  text-align: center; }
+
+th.org-center {
+  text-align: center; }
+
+td.org-right {
+  text-align: right; }
+
+td.org-left {
+  text-align: left; }
+
+td.org-center {
+  text-align: center; }
+
+span.acr {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em; }
+
+div.table {
+  position: relative; }
+  div.table .gutter {
+    left: calc(20px - 2.5rem);
+    padding-top: 18px; }
+  div.table .tabular {
+    max-width: 100%;
+    overflow-x: auto; }
+
+table {
+  border-color: var(--text-light);
+  border-left: transparent;
+  border-right: transparent;
+  border-style: solid;
+  border-width: 2px;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: "Open Sans";
+  margin: 20px;
+  padding: 20px; }
+  table thead {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text-light);
+    font-size: 15px; }
+    table thead tr th {
+      padding: 4px 10px;
+      background-color: #9991; }
+    table thead tr:last-of-type th {
+      border-bottom: solid 1px var(--text-light); }
+  table tr, table th, table td {
+    border: none; }
+  table tbody tr td {
+    border-top: 0;
+    padding: 0 10px; }
+  table tr {
+    line-height: 1.9; }
+  table caption {
+    margin-bottom: 10px;
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray); }
+    table caption .table-number {
+      font-family: "Open Sans";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 12px;
+      line-height: 1.9;
+      color: var(--text-light); }
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px; }
+
+::-webkit-scrollbar-track {
+  background: #9992; }
+
+::-webkit-scrollbar-thumb {
+  background: #ccc; }
+
+::-webkit-scrollbar-thumb:hover {
+  background: #888; }
+
+@media (min-width: 1280px) {
+  #table-of-contents {
+    position: fixed;
+    width: 18rem;
+    right: 1rem;
+    top: 0;
+    padding: 1em;
+    line-height: 1.5;
+    margin-top: 4rem; }
+    #table-of-contents h2 {
+      margin-top: 0; }
+    #table-of-contents #text-table-of-contents {
+      position: relative; }
+      #table-of-contents #text-table-of-contents::before, #table-of-contents #text-table-of-contents::after {
+        position: absolute;
+        content: '';
+        width: calc(100% - 10px);
+        height: 0.7rem;
+        left: 0;
+        z-index: 1; }
+      #table-of-contents #text-table-of-contents::before {
+        top: 0;
+        background: linear-gradient(180deg, var(--back-light) 0%, var(--back-light) 35%, rgba(0, 0, 0, 0) 100%); }
+      #table-of-contents #text-table-of-contents::after {
+        bottom: 0;
+        background: linear-gradient(0deg, var(--back-light) 0%, var(--back-light) 35%, rgba(0, 0, 0, 0) 100%); }
+      #table-of-contents #text-table-of-contents > ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: calc(100vh - 5rem - 50px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin; }
+        #table-of-contents #text-table-of-contents > ul ul {
+          padding-left: 2em; }
+        #table-of-contents #text-table-of-contents > ul ul.active {
+          display: inline-block; }
+        #table-of-contents #text-table-of-contents > ul li.active > ul {
+          display: inline-block; }
+        #table-of-contents #text-table-of-contents > ul li.active > label a, #table-of-contents #text-table-of-contents > ul li.active > a {
+          color: var(--text-dark); }
+        #table-of-contents #text-table-of-contents > ul li.active > input:not(:checked) ~ label::after {
+          transform: rotate(90deg);
+          top: 5px;
+          opacity: 0.35; }
+        #table-of-contents #text-table-of-contents > ul > li:last-child {
+          margin-bottom: 2rem; } }
+
+@media (min-width: 1440px) {
+  #table-of-contents {
+    width: 20rem;
+    right: 2rem; } }
+
+@media (min-width: 1640px) {
+  #table-of-contents {
+    right: 5rem; } }
+
+@media (min-width: 2000px) {
+  #table-of-contents {
+    width: 25rem; } }
+
+#table-of-contents #text-table-of-contents ul {
+  width: 100%; }
+
+#table-of-contents #text-table-of-contents > ul ul {
+  display: none; }
+
+#table-of-contents #text-table-of-contents li input[type=checkbox] {
+  display: none; }
+
+#table-of-contents #text-table-of-contents li label {
+  display: inline-block;
+  width: 100%;
+  position: relative; }
+
+#table-of-contents #text-table-of-contents li a {
+  display: inline-block;
+  color: var(--text-gray);
+  text-decoration: none !important;
+  text-shadow: none;
+  background: none !important; }
+
+#table-of-contents #text-table-of-contents li label::after {
+  content: "\25b6";
+  color: var(--text-gray);
+  margin-left: 0.5em;
+  font-size: 10px;
+  display: inline-block;
+  position: absolute;
+  top: 3.4px;
+  left: -20px;
+  opacity: 0.8; }
+
+#table-of-contents #text-table-of-contents li input:checked ~ ul {
+  display: inline-block !important; }
+
+#table-of-contents #text-table-of-contents li input:checked ~ label a {
+  font-weight: bold; }
+
+#table-of-contents #text-table-of-contents li input:checked ~ label::after {
+  transform: rotate(90deg);
+  top: 5px; }
+
+#table-of-contents #text-table-of-contents li::before {
+  content: "" !important; }
+
+#breadcrumbs {
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--text-light); }
+  #breadcrumbs a {
+    background-image: none; }
+
+.edits {
+  margin-top: 70px;
+  border-width: 0;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-color: var(--back-light);
+  padding-top: 30px;
+  font-family: "Open Sans";
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-gray); }
+  .edits p, .edits li {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-gray); }
+  .edits li {
+    margin-bottom: 16px; }
+
+.edits::before {
+  content: 'EDITS';
+  font-family: 'Open Sans';
+  font-size: 18px;
+  letter-spacing: 5px; }
+
+.page-tags a {
+  padding: 0.1em 0.2em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--back-light);
+  border-radius: 1px;
+  font-family: "Open Sans";
+  font-variant: all-small-caps;
+  font-size: max(0.4em, 10px);
+  font-style: normal;
+  letter-spacing: 2px;
+  background-image: none;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 0.1em 0.5em;
+  background-color: var(--back-white);
+  margin-right: 5px;
+  line-height: 3em; }
+  .page-tags a:hover {
+    background-color: var(--back-light);
+    background-image: none; }
+  .page-tags a:not(.active) {
+    border-color: var(--back-white); }
+  .page-tags a.active {
+    text-shadow: none;
+    text-decoration: none;
+    color: var(--back-white);
+    background-color: var(--code-foreground); }
+    .page-tags a.active:hover {
+      background-color: var(--back-light);
+      background-image: none;
+      color: var(--text-dark); }
+</style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<input type='checkbox' id='theme-switch'><div id='page'><label id='switch-label' for='theme-switch'></label><div id="content">
+<div class='page-header'><div class='page-meta'>2021-03-01 14:57; CST, Chase Johnson</div><h1 class="title">Functional vs Imperative<p class="subtitle">Comparing Paradigms Side By Side</p>
+</h1></div>
+<nav id="table-of-contents">
+<h2><a href="#" style="color:inherit; text-decoration: none;">Table of Contents</a></h2>
+<div id="text-table-of-contents">
+<ul>
+<li><input type='checkbox' id='toc--org122d64b'/><label for='toc--org122d64b'><a href="#org122d64b">1. Introduction</a></label>
+<ul>
+<li><a href="#org50503be">1.1. What is Functional Programming?</a></li>
+<li><input type='checkbox' id='toc--orgdd5d37e'/><label for='toc--orgdd5d37e'><a href="#orgdd5d37e">1.2. Introduction to OCaml</a></label>
+<ul>
+<li><a href="#orgdd9aece">1.2.1. Types</a></li>
+<li><a href="#orgbd70df7">1.2.2. Pattern Matching</a></li>
+<li><a href="#org444cd6c">1.2.3. Functions as Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><input type='checkbox' id='toc--orga561b38'/><label for='toc--orga561b38'><a href="#orga561b38">2. Perspective of a Program</a></label>
+<ul>
+<li><a href="#orgb80c047">2.1. Imperative</a></li>
+<li><a href="#org905d675">2.2. Functional</a></li>
+</ul>
+</li>
+<li><input type='checkbox' id='toc--org67887e8'/><label for='toc--org67887e8'><a href="#org67887e8">3. Reasoning Correctness &amp; Edge Cases</a></label>
+<ul>
+<li><a href="#org1dfea98">3.1. Imperative</a></li>
+<li><a href="#org1d3a74d">3.2. Functional</a></li>
+</ul>
+</li>
+<li><input type='checkbox' id='toc--org38a8af9'/><label for='toc--org38a8af9'><a href="#org38a8af9">4. Polymorphism</a></label>
+<ul>
+<li><input type='checkbox' id='toc--org949ee61'/><label for='toc--org949ee61'><a href="#org949ee61">4.1. Imperative</a></label>
+<ul>
+<li><a href="#org8476c02">4.1.1. Using Our Class</a></li>
+</ul>
+</li>
+<li><input type='checkbox' id='toc--orgbbc154d'/><label for='toc--orgbbc154d'><a href="#orgbbc154d">4.2. Functional</a></label>
+<ul>
+<li><a href="#orge809dcf">4.2.1. Using the Functor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+
+<div id="outline-container-org122d64b" class="outline-2">
+<h2 id="org122d64b"><span class="section-number-2">1</span> Introduction<a aria-hidden="true" href="#org122d64b">#</a> </h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org50503be" class="outline-3">
+<h3 id="org50503be"><span class="section-number-3">1.1</span> What is Functional Programming?<a aria-hidden="true" href="#org50503be">#</a> </h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+If you already have experienced functional programming, or feel like you have a
+good grasp on its concepts, feel free to jump ahead to the next sub section. This
+will only be review for you.
+</p>
+
+<p>
+If you have never heard of functional programming, take some time to ponder on
+the design and don&rsquo;t jump to conclusions.
+</p>
+
+<p>
+My first time using a functional language was much like my first time
+programming recursively. It was difficult to break out of my tendencies to write
+for loops. This comparison is especially relevant since functional languages
+usually encourage recursive thoughts and implementations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd5d37e" class="outline-3">
+<h3 id="orgdd5d37e"><span class="section-number-3">1.2</span> Introduction to OCaml<a aria-hidden="true" href="#orgdd5d37e">#</a> </h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+If you are familiar with <a href="https://ocaml.org/">OCaml</a>, feel free to jump to the next section now.
+Otherwise, I&rsquo;d advise looking over the <a href="https://ocaml.org/releases/4.11/htmlman/index.html">manual</a> chapter 1. I&rsquo;ll summarize briefly
+the main points here.
+</p>
+</div>
+
+<div id="outline-container-orgdd9aece" class="outline-4">
+<h4 id="orgdd9aece"><span class="section-number-4">1.2.1</span> Types<a aria-hidden="true" href="#orgdd9aece">#</a> </h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+OCaml shares many types with traditional languages with one exception, the
+array. While OCaml does allow arrays, it&rsquo;s much more common to use a list, which
+is similar to a <a href="https://en.wikipedia.org/wiki/Linked_list">linked list</a>. Links from one node to another is called <code>cons</code>
+(infix <code>::</code> is the cons operator) and the ending is <code>[]</code>.
+</p>
+
+<p>
+For example: <code>1::2::[]</code> is equivalent to <code>[1;2]</code> which is equivalent to the linked
+list:
+</p>
+
+
+<figure id="org3c796e4">
+<img src="images/linked_list.png" alt="Linked list of 1-&gt;2" class="invertible">
+
+</figure>
+
+<p>
+Custom types can easily replace the notion of a <code>struct</code>.
+</p>
+<details id='org19be42a' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org19be42a'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">simple_pair</span> = { a: int; b: char; }<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='orgd9bc6a5' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgd9bc6a5'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">s</span> = { a = <span class="org-highlight-numbers-number">1</span>; b = <span class="org-string">'x'</span> }<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org38e0533' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#org38e0533'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+val s : simple_pair = {a = 1; b = 'x'}
+</pre>
+
+</details>
+
+
+<p>
+Custom types can also be defined to represent disjoint sets of items (otherwise
+known as variant records). This can be very useful for concepts link a <a href="https://en.wikipedia.org/wiki/Binary_tree">binary
+tree</a>.
+</p>
+
+<details id='org42b64da' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org42b64da'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">int_btree</span> =
+  | <span class="org-tuareg-font-lock-constructor">Leaf</span> <span class="org-keyword">of</span> int
+  | <span class="org-tuareg-font-lock-constructor">Node</span> <span class="org-keyword">of</span> int * int_btree * int_btree<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<p>
+Let&rsquo;s define the binary tree:
+</p>
+
+
+<figure id="orga20fc47">
+<img src="images/binary_tree.png" alt="Basic binary tree" class="invertible">
+
+</figure>
+
+<p>
+with:
+</p>
+
+<details id='orga892fde' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orga892fde'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">my_tree</span> = <span class="org-tuareg-font-lock-constructor">Node</span>(<span class="org-highlight-numbers-number">2</span>, <span class="org-tuareg-font-lock-constructor">Leaf</span>(<span class="org-highlight-numbers-number">1</span>), <span class="org-tuareg-font-lock-constructor">Leaf</span>(<span class="org-highlight-numbers-number">3</span>))<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='orge1a04a6' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#orge1a04a6'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+Node (2, Leaf 1, Leaf 3)
+</pre>
+
+</details>
+</div>
+</div>
+
+<div id="outline-container-orgbd70df7" class="outline-4">
+<h4 id="orgbd70df7"><span class="section-number-4">1.2.2</span> Pattern Matching<a aria-hidden="true" href="#orgbd70df7">#</a> </h4>
+<div class="outline-text-4" id="text-1-2-2">
+<p>
+OCaml allows conditionals based on the structure / type of the input. This is
+especially powerful when used in conjunction with OCaml&rsquo;s type system, such as
+our previously defined binary tree. Suppose we want a simple function to check
+if our tree is empty.
+</p>
+
+<details id='org2947304' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org2947304'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">is_leaf</span> <span class="org-variable-name">t</span> =
+  <span class="org-keyword">match</span> t <span class="org-keyword">with</span>
+    <span class="org-tuareg-font-lock-constructor">Leaf</span> -&gt; <span class="org-constant">true</span>
+  | <span class="org-tuareg-font-lock-constructor">Node</span> (v,left,right) -&gt; <span class="org-constant">false</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='orgfde32f8' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgfde32f8'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">empty_example</span> = is_leaf <span class="org-tuareg-font-lock-constructor">Leaf</span>(<span class="org-highlight-numbers-number">1</span>)<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='orge80bc23' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#orge80bc23'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+true
+</pre>
+
+</details>
+
+
+<details id='orgd2f454d' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgd2f454d'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">other_example</span> = is_leaf (<span class="org-tuareg-font-lock-constructor">Node</span>(<span class="org-highlight-numbers-number">1</span>, <span class="org-tuareg-font-lock-constructor">Leaf</span>(<span class="org-highlight-numbers-number">2</span>), <span class="org-tuareg-font-lock-constructor">Leaf</span>(<span class="org-highlight-numbers-number">3</span>)))<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='orga911a8b' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#orga911a8b'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+false
+</pre>
+
+</details>
+</div>
+</div>
+<div id="outline-container-org444cd6c" class="outline-4">
+<h4 id="org444cd6c"><span class="section-number-4">1.2.3</span> Functions as Arguments<a aria-hidden="true" href="#org444cd6c">#</a> </h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+A foundational concept of functional programs is that functions are first class
+citizens. As such, they can be parameters to other functions. There is a common
+function implemented by default in these languages called <code>map</code>.
+</p>
+
+<p>
+<code>map</code> will take a function, <code>f</code>, and a list, <code>l</code>, applying <code>f</code> to every element in <code>l</code>.
+</p>
+
+<details id='orgceb1bd8' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgceb1bd8'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">map</span> <span class="org-variable-name">f</span> <span class="org-variable-name">l</span> =
+  <span class="org-keyword">match</span> l <span class="org-keyword">with</span>
+    <span class="org-tuareg-font-lock-constructor">[]</span> -&gt; <span class="org-tuareg-font-lock-constructor">[]</span>
+  | h<span class="org-tuareg-font-lock-constructor">::</span>tl -&gt; (f h)<span class="org-tuareg-font-lock-constructor">::</span>(map f tl)<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<p>
+Now, we can pass a function into <code>map</code>.
+</p>
+
+<details id='orga9567c5' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orga9567c5'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">add_one</span> <span class="org-variable-name">a</span> = a + <span class="org-highlight-numbers-number">1</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org9677df1' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org9677df1'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">map_example</span> = map add_one [<span class="org-highlight-numbers-number">1</span>; <span class="org-highlight-numbers-number">2</span>; <span class="org-highlight-numbers-number">3</span>]<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org80f0529' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#org80f0529'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+val map_example : int list = [2; 3; 4]
+</pre>
+
+</details>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga561b38" class="outline-2">
+<h2 id="orga561b38"><span class="section-number-2">2</span> Perspective of a Program<a aria-hidden="true" href="#orga561b38">#</a> </h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Suppose we want to find the maximum number of an array <code>A</code> with size <code>n</code>. How does
+the programming language we use influence our implementation?
+</p>
+</div>
+<div id="outline-container-orgb80c047" class="outline-3">
+<h3 id="orgb80c047"><span class="section-number-3">2.1</span> Imperative<a aria-hidden="true" href="#orgb80c047">#</a> </h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+In imperative programming, operations will modify the program&rsquo;s state. These
+state transformations are performed in a specific order to obtain a desired
+result in the state. To solve our problem, we initialize a state to hold the
+maximum of every subarray until this subarray is the entirety of <code>A</code>.
+</p>
+
+<details id='org4ff46c4' class='code' open><summary class='named'><span class='name'>Maximum of Array in C</span><span class='lang'>C</span></summary>
+<div class='gutter'>
+<a href='#org4ff46c4'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-C"><span class="org-type">int</span> <span class="org-function-name">max_arr</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">int</span>* <span class="org-variable-name">arr</span>, <span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-type">int</span> <span class="org-variable-name">max</span> = arr<span class="org-rainbow-delimiters-depth-2">[</span><span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-2">]</span>;
+    <span class="org-keyword">while</span><span class="org-rainbow-delimiters-depth-2">(</span>i != n<span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>arr<span class="org-rainbow-delimiters-depth-1">[</span>i<span class="org-rainbow-delimiters-depth-1">]</span> &gt; max<span class="org-rainbow-delimiters-depth-3">)</span>
+            max = arr<span class="org-rainbow-delimiters-depth-3">[</span>i<span class="org-rainbow-delimiters-depth-3">]</span>;
+        i += <span class="org-highlight-numbers-number">1</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+    <span class="org-keyword">return</span> max;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+
+<p>
+You likely do this intuitively. If I were to ask you to write this program you
+would likely come up with the same result as mine &#x2014; except possibly using a
+<code>for</code> loop or a different conditional.
+</p>
+</div>
+</div>
+<div id="outline-container-org905d675" class="outline-3">
+<h3 id="org905d675"><span class="section-number-3">2.2</span> Functional<a aria-hidden="true" href="#org905d675">#</a> </h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+In functional programming, we view a program as a composition of functions.
+Instead of modifying internal state, we map values in the mathematical sense. To
+solve the maximum array problem, we define a recursive solution.
+</p>
+
+<details id='org7ac4649' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org7ac4649'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">max_list</span> <span class="org-variable-name">l</span> =
+  <span class="org-keyword">match</span> l <span class="org-keyword">with</span>
+  | [x] -&gt; x
+  | h<span class="org-tuareg-font-lock-constructor">::</span>tl -&gt; max h (max_list tl)<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<p>
+We use the built in <code>max</code> function which takes two parameters and returns the
+larger of the two, applying it to the list recursively.
+</p>
+
+<p>
+But let&rsquo;s inspect what OCaml tells us about our new function.
+</p>
+<details id='orgc55b943' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#orgc55b943'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example" id="orgc55b943">
+ Lines 2-4, characters 2-32:
+ 2 | ..match l with
+ 3 |   | [x] -&gt; x
+ 4 |   | h::tl -&gt; max h (max_list tl)....
+ Warning 8: this pattern-matching is not exhaustive.
+ Here is an example of a case that is not matched:
+ []
+ val max_list : 'a list -&gt; 'a = &lt;fun&gt;
+</pre>
+
+</details>
+
+<p>
+A fact that we overlooked in our imperative version is immediately evident in
+our functional version.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org67887e8" class="outline-2">
+<h2 id="org67887e8"><span class="section-number-2">3</span> Reasoning Correctness &amp; Edge Cases<a aria-hidden="true" href="#org67887e8">#</a> </h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Suppose this function <code>max</code> is more complex. Your team lead notices that this
+function&rsquo;s correctness is vital to your customers so they want to ensure it is
+correct. It&rsquo;s so vital, there should some sort of formal proof.
+</p>
+</div>
+
+<div id="outline-container-org1dfea98" class="outline-3">
+<h3 id="org1dfea98"><span class="section-number-3">3.1</span> Imperative<a aria-hidden="true" href="#org1dfea98">#</a> </h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+We may prove this through a loop invariant. I see a loop invariant as a slight
+variation of induction. If this works for the base case (an array of a single
+element) and we prove that it works for any arbitrary \(k\) to \(k+1\), then we
+prove it works for all cases.
+</p>
+
+<details id='orga54f046' class='code' open><summary class='named'><span class='name'>Maximum of Array in C with Loop Invariant</span><span class='lang'>C</span></summary>
+<div class='gutter'>
+<a href='#orga54f046'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-C"><span class="org-type">int</span> <span class="org-function-name">max_arr</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">int</span>* <span class="org-variable-name">arr</span>, <span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-type">int</span> <span class="org-variable-name">i</span> = <span class="org-highlight-numbers-number">1</span>;
+    <span class="org-type">int</span> <span class="org-variable-name">max</span> = arr<span class="org-rainbow-delimiters-depth-2">[</span><span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-2">]</span>;
+    <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..0]</span>
+    <span class="org-keyword">while</span><span class="org-rainbow-delimiters-depth-2">(</span>i != n<span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i-1]</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>arr<span class="org-rainbow-delimiters-depth-1">[</span>i<span class="org-rainbow-delimiters-depth-1">]</span> &gt; max<span class="org-rainbow-delimiters-depth-3">)</span>
+            max = arr<span class="org-rainbow-delimiters-depth-3">[</span>i<span class="org-rainbow-delimiters-depth-3">]</span>;
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i]</span>
+        i += <span class="org-highlight-numbers-number">1</span>;
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i-1]</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum value of subarray arr[0..i-1]</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">i = n (from while loop condition)</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">therefore, max is the maximum value of arr[0..n-1]</span>
+    <span class="org-keyword">return</span> max;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+
+<p>
+This process is cumbersome and unwieldy for most industries and applications. Instead,
+something like a series of unit tests better fits this function. Yet, then we
+get into another conversation about which inputs to use for testing and
+something like the array of length 0 case could remain overlooked.
+</p>
+
+<p>
+Let&rsquo;s say the empty array case is caught &#x2013; it likely would be given <code>max</code> is not
+very complex. How do we address it? Well, there are a couple of possibilities.
+Given we are working in C, a fairly common solution is to return <code>null</code> or a value
+outside of the expected range.
+</p>
+
+<details id='orgc797225' class='code' open><summary class='named'><span class='name'>Maximum of Array in C with Loop Invariant</span><span class='lang'>C</span></summary>
+<div class='gutter'>
+<a href='#orgc797225'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-C"><span class="org-type">int</span> <span class="org-function-name">max_arr</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">int</span>* <span class="org-variable-name">arr</span>, <span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-2">(</span>n == <span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-2">)</span>
+        <span class="org-keyword">return</span> <span class="org-constant">NULL</span>;
+    <span class="org-type">int</span> <span class="org-variable-name">i</span> = <span class="org-highlight-numbers-number">1</span>;
+    <span class="org-type">int</span> <span class="org-variable-name">max</span> = arr<span class="org-rainbow-delimiters-depth-2">[</span><span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-2">]</span>;
+    <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..0]</span>
+    <span class="org-keyword">while</span><span class="org-rainbow-delimiters-depth-2">(</span>i != n<span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i-1]</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>arr<span class="org-rainbow-delimiters-depth-1">[</span>i<span class="org-rainbow-delimiters-depth-1">]</span> &gt; max<span class="org-rainbow-delimiters-depth-3">)</span>
+            max = arr<span class="org-rainbow-delimiters-depth-3">[</span>i<span class="org-rainbow-delimiters-depth-3">]</span>;
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i]</span>
+        i += <span class="org-highlight-numbers-number">1</span>;
+        <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum of subarray arr[0..i-1]</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">max is the maximum value of subarray arr[0..i-1]</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">i = n (from while loop condition)</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">therefore, max is the maximum value of arr[0..n-1]</span>
+    <span class="org-keyword">return</span> max;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+
+<p>
+But when functions call this, how do they know it may return <code>NULL</code>? There may be
+a comment before saying, &ldquo;returns <code>NULL</code> in the case that the array is length 0,&rdquo;
+but this isn&rsquo;t immediately evident to another programmer using the function. At
+worst, it may go unnoticed until a runtime error occurs in production.
+</p>
+
+<p>
+Imperative languages that could raise an exception can also hide the possibility
+in some languages. Java&rsquo;s <code>throws IllegalArgumentException</code> is an example of an
+ideal implementation. It forces callers to account for the possible failure.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1d3a74d" class="outline-3">
+<h3 id="org1d3a74d"><span class="section-number-3">3.2</span> Functional<a aria-hidden="true" href="#org1d3a74d">#</a> </h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+We can trivially apply a formal proof in the same inductive form. Our function
+has the base case: a singular element list, and the recursive case: the maximum
+of a list is the maximum of the first element and the maximum of the remainder
+of the list. That is, if we didn&rsquo;t have this empty case.
+</p>
+
+<p>
+Functional languages address this by adding in an <code>option</code> type. This allows
+conditionally returning a value from a function. <code>Some</code> represents an actual
+value, whereas <code>None</code> represents failure to produce a value.
+</p>
+
+<details id='org43c455f' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org43c455f'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">option_max_list</span> <span class="org-variable-name">l</span> =
+  <span class="org-keyword">match</span> l <span class="org-keyword">with</span>
+    <span class="org-tuareg-font-lock-constructor">[]</span> -&gt; <span class="org-tuareg-font-lock-constructor">None</span>
+  | [x] -&gt; <span class="org-tuareg-font-lock-constructor">Some</span> x
+  | h<span class="org-tuareg-font-lock-constructor">::</span>tl -&gt; <span class="org-tuareg-font-lock-constructor">Some</span> (max h (<span class="org-tuareg-font-lock-module">Option.</span>get (option_max_list tl)))<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org78e2b7c' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org78e2b7c'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">empty_max</span> = option_max_list <span class="org-tuareg-font-lock-constructor">[]</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org70eb9ef' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#org70eb9ef'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+None
+</pre>
+
+</details>
+
+
+<details id='org7fd30c7' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org7fd30c7'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">some_max</span> = option_max_list [<span class="org-highlight-numbers-number">1</span>;<span class="org-highlight-numbers-number">2</span>;<span class="org-highlight-numbers-number">3</span>;<span class="org-highlight-numbers-number">4</span>]<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org09d03c4' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#org09d03c4'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+Some 4
+</pre>
+
+</details>
+
+
+<p>
+Moreover, this returning an optional type <i>forces</i> functions that call it to
+account for its possible failure. A programmer using the function is immediately
+aware of the functions inabilities. From our recursive calls to <code>option_max_list</code>,
+we have to use <code>Option.get</code> which requires <code>Some</code> or else an exception will be
+raised. We can prove that we will always get <code>Some</code> from recursive calls quite
+easily, so this will not arise.
+</p>
+
+<p>
+You may already be familiar with the <code>Option</code> notion from some imperative
+languages. These could be <code>Nullable</code> from C#, <code>Option</code> from Rust, or <code>Optional</code> from
+Java. These were gathered from functional language&rsquo;s implementations.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org38a8af9" class="outline-2">
+<h2 id="org38a8af9"><span class="section-number-2">4</span> Polymorphism<a aria-hidden="true" href="#org38a8af9">#</a> </h2>
+<div class="outline-text-2" id="text-4">
+<p>
+The ability to derive concrete objects with polymorphism is an essential aspect
+for most languages. We need a general typed binary search tree with <code>contains</code>,
+<code>insert</code>, and <code>inorder</code>.
+</p>
+</div>
+
+<div id="outline-container-org949ee61" class="outline-3">
+<h3 id="org949ee61"><span class="section-number-3">4.1</span> Imperative<a aria-hidden="true" href="#org949ee61">#</a> </h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Let&rsquo;s use Java for examples since its class system is a main
+drawing point for its use.
+</p>
+
+<details id='org858abe8' class='code' open><summary><span class='lang'>Java</span></summary>
+<div class='gutter'>
+<a href='#org858abe8'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">public</span> <span class="org-keyword">class</span> <span class="org-type">BinarySearchTree</span><span class="org-rainbow-delimiters-depth-1">&lt;</span><span class="org-type">T</span> <span class="org-keyword">extends</span> <span class="org-type">Comparable</span><span class="org-rainbow-delimiters-depth-2">&lt;</span>? <span class="org-keyword">super</span> <span class="org-type">T</span><span class="org-rainbow-delimiters-depth-2">&gt;</span><span class="org-rainbow-delimiters-depth-1">&gt;</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-2">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-2">&gt;</span> <span class="org-variable-name">root</span>;
+    <span class="org-keyword">public</span> <span class="org-function-name">BinarySearchTree</span><span class="org-rainbow-delimiters-depth-2">()</span> <span class="org-rainbow-delimiters-depth-2">{}</span>
+
+    <span class="org-keyword">public</span> <span class="org-type">boolean</span> <span class="org-function-name">contains</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">T</span> <span class="org-variable-name">value</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">return</span> contains<span class="org-rainbow-delimiters-depth-3">(</span>root, value<span class="org-rainbow-delimiters-depth-3">)</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+
+    <span class="org-keyword">private</span> <span class="org-type">boolean</span> <span class="org-function-name">contains</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-3">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-3">&gt;</span> <span class="org-variable-name">node</span>, <span class="org-type">T</span> <span class="org-variable-name">value</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>node == <span class="org-constant">null</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">return</span> <span class="org-constant">false</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span>
+        <span class="org-type">int</span> <span class="org-variable-name">cmp</span> = value.compareTo<span class="org-rainbow-delimiters-depth-3">(</span>node.value<span class="org-rainbow-delimiters-depth-3">)</span>;
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>cmp == <span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">return</span> <span class="org-constant">true</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span> <span class="org-keyword">else</span> <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>cmp &lt; <span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">return</span> contains<span class="org-rainbow-delimiters-depth-1">(</span>node.left, value<span class="org-rainbow-delimiters-depth-1">)</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span> <span class="org-keyword">else</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">return</span> contains<span class="org-rainbow-delimiters-depth-1">(</span>node.right, value<span class="org-rainbow-delimiters-depth-1">)</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+
+    <span class="org-keyword">public</span> <span class="org-type">void</span> <span class="org-function-name">insert</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">T</span> <span class="org-variable-name">value</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        insert<span class="org-rainbow-delimiters-depth-3">(</span>root, value<span class="org-rainbow-delimiters-depth-3">)</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+
+    <span class="org-keyword">private</span> <span class="org-type">void</span> <span class="org-function-name">insert</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-3">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-3">&gt;</span> <span class="org-variable-name">node</span>, <span class="org-type">T</span> <span class="org-variable-name">value</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>node == <span class="org-constant">null</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">this</span>.root = <span class="org-keyword">new</span> <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-1">&lt;&gt;(</span>value<span class="org-rainbow-delimiters-depth-1">)</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span>
+        <span class="org-type">int</span> <span class="org-variable-name">cmp</span> = value.compareTo<span class="org-rainbow-delimiters-depth-3">(</span>node.value<span class="org-rainbow-delimiters-depth-3">)</span>;
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>cmp == <span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">return</span>;
+        <span class="org-rainbow-delimiters-depth-3">}</span> <span class="org-keyword">else</span> <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>cmp &lt; <span class="org-highlight-numbers-number">0</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-1">(</span>node.left == <span class="org-constant">null</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+                node.left = <span class="org-keyword">new</span> <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-2">&lt;&gt;(</span>value<span class="org-rainbow-delimiters-depth-2">)</span>;
+            <span class="org-rainbow-delimiters-depth-1">}</span> <span class="org-keyword">else</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+                insert<span class="org-rainbow-delimiters-depth-2">(</span>node.left, value<span class="org-rainbow-delimiters-depth-2">)</span>;
+            <span class="org-rainbow-delimiters-depth-1">}</span>
+        <span class="org-rainbow-delimiters-depth-3">}</span> <span class="org-keyword">else</span> <span class="org-rainbow-delimiters-depth-3">{</span>
+            <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-1">(</span>node.right == <span class="org-constant">null</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+                node.right = <span class="org-keyword">new</span> <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-2">&lt;&gt;(</span>value<span class="org-rainbow-delimiters-depth-2">)</span>;
+            <span class="org-rainbow-delimiters-depth-1">}</span> <span class="org-keyword">else</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+                insert<span class="org-rainbow-delimiters-depth-2">(</span>node.right, value<span class="org-rainbow-delimiters-depth-2">)</span>;
+            <span class="org-rainbow-delimiters-depth-1">}</span>
+        <span class="org-rainbow-delimiters-depth-3">}</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+
+    <span class="org-keyword">public</span> <span class="org-type">void</span> <span class="org-function-name">inorder</span><span class="org-rainbow-delimiters-depth-2">()</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        inorder<span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">this</span>.root<span class="org-rainbow-delimiters-depth-3">)</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+
+    <span class="org-keyword">private</span> <span class="org-type">void</span> <span class="org-function-name">inorder</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-3">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-3">&gt;</span> <span class="org-variable-name">node</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>node == <span class="org-constant">null</span><span class="org-rainbow-delimiters-depth-3">)</span>
+            <span class="org-keyword">return</span>;
+        inorder<span class="org-rainbow-delimiters-depth-3">(</span>node.left<span class="org-rainbow-delimiters-depth-3">)</span>;
+        System.out.println<span class="org-rainbow-delimiters-depth-3">(</span>node.value<span class="org-rainbow-delimiters-depth-3">)</span>;
+        inorder<span class="org-rainbow-delimiters-depth-3">(</span>node.right<span class="org-rainbow-delimiters-depth-3">)</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+
+<p>
+We specify that the included value must have or extends a class that is
+<code>Comparable</code> so that we may force ordering in the tree. But, we need to define
+this class too.
+</p>
+
+<details id='org5f48182' class='code' open><summary><span class='lang'>Java</span></summary>
+<div class='gutter'>
+<a href='#org5f48182'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">public</span> <span class="org-keyword">class</span> <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-1">&lt;</span><span class="org-type">T</span> <span class="org-keyword">extends</span> <span class="org-type">Comparable</span><span class="org-rainbow-delimiters-depth-2">&lt;</span>? <span class="org-keyword">super</span> <span class="org-type">T</span><span class="org-rainbow-delimiters-depth-2">&gt;</span><span class="org-rainbow-delimiters-depth-1">&gt;</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-keyword">public</span> <span class="org-type">T</span> <span class="org-variable-name">value</span>;
+    <span class="org-keyword">public</span> <span class="org-type">TreeNode</span><span class="org-rainbow-delimiters-depth-2">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-2">&gt;</span> <span class="org-variable-name">left</span>, <span class="org-variable-name">right</span>;
+    <span class="org-keyword">public</span> <span class="org-function-name">TreeNode</span><span class="org-rainbow-delimiters-depth-2">&lt;</span><span class="org-type">T</span><span class="org-rainbow-delimiters-depth-2">&gt;(</span><span class="org-type">T</span> <span class="org-variable-name">value</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-keyword">this</span>.value = value;
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+</div>
+
+<div id="outline-container-org8476c02" class="outline-4">
+<h4 id="org8476c02"><span class="section-number-4">4.1.1</span> Using Our Class<a aria-hidden="true" href="#org8476c02">#</a> </h4>
+<div class="outline-text-4" id="text-4-1-1">
+<details id='org8ddd53b' class='code' open><summary><span class='lang'>Java</span></summary>
+<div class='gutter'>
+<a href='#org8ddd53b'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-java"><span class="org-keyword">public</span> <span class="org-keyword">static</span> <span class="org-type">void</span> <span class="org-function-name">main</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">String</span><span class="org-rainbow-delimiters-depth-2">[]</span> <span class="org-variable-name">args</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-type">BinarySearchTree</span><span class="org-rainbow-delimiters-depth-2">&lt;</span><span class="org-type">Integer</span><span class="org-rainbow-delimiters-depth-2">&gt;</span> <span class="org-variable-name">bst</span> = <span class="org-keyword">new</span> <span class="org-type">BinarySearchTree</span><span class="org-rainbow-delimiters-depth-2">&lt;&gt;()</span>;
+    bst.insert<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-highlight-numbers-number">5</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+    bst.insert<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-highlight-numbers-number">10</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+    bst.insert<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-highlight-numbers-number">100</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</details>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbbc154d" class="outline-3">
+<h3 id="orgbbc154d"><span class="section-number-3">4.2</span> Functional<a aria-hidden="true" href="#orgbbc154d">#</a> </h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+How do we achieve this in OCaml? The notion of a <code>module</code> and more importantly, a
+<b>functor</b>. A functor is a way to parameterize modules by providing other modules
+to it. We define a module that implements comparison between its type, and while
+we&rsquo;re at it, let&rsquo;s define a more informative return type for comparison than
+simply integers.
+</p>
+<details id='orgdbd6bca' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgdbd6bca'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">comparison</span> =
+    <span class="org-tuareg-font-lock-constructor">Less</span>
+  | <span class="org-tuareg-font-lock-constructor">Equal</span>
+  | <span class="org-tuareg-font-lock-constructor">Greater</span><span class="org-tuareg-font-double-semicolon">;;</span>
+
+<span class="org-tuareg-font-lock-governing">module type</span> <span class="org-tuareg-font-lock-module">COMPARABLE</span> =
+  <span class="org-tuareg-font-lock-governing">sig</span>
+    <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">t</span>
+    <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">compare</span>: t -&gt; t -&gt; comparison
+    <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">print</span>: t -&gt; unit
+  <span class="org-tuareg-font-lock-governing">end</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<p>
+Then we may make the overall module and require a parameter for the inner type.
+</p>
+
+<details id='orga52d099' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orga52d099'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">BinarySearchTree</span> =
+  <span class="org-tuareg-font-lock-governing">functor</span> (<span class="org-variable-name">Val</span>: <span class="org-type">COMPARABLE</span>) -&gt;
+  <span class="org-tuareg-font-lock-governing">struct</span>
+    <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">value</span> = <span class="org-tuareg-font-lock-module">Val.</span>t
+    <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">node</span> =
+        <span class="org-tuareg-font-lock-constructor">Empty</span>
+      | <span class="org-tuareg-font-lock-constructor">Node</span> <span class="org-keyword">of</span> value * node * node
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">empty</span> = <span class="org-tuareg-font-lock-constructor">Empty</span>
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">contains</span> <span class="org-variable-name">node</span> <span class="org-variable-name">v</span> =
+      <span class="org-keyword">match</span> node <span class="org-keyword">with</span>
+        <span class="org-tuareg-font-lock-constructor">Empty</span> -&gt; <span class="org-constant">false</span>
+      | <span class="org-tuareg-font-lock-constructor">Node</span> (x, l, r) -&gt; <span class="org-keyword">match</span> <span class="org-tuareg-font-lock-module">Val.</span>compare x v <span class="org-keyword">with</span>
+                           <span class="org-tuareg-font-lock-constructor">Equal</span> -&gt; <span class="org-constant">true</span>
+                         | <span class="org-tuareg-font-lock-constructor">Less</span> -&gt; contains l v
+                         | <span class="org-tuareg-font-lock-constructor">Greater</span> -&gt; contains r v
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">insert</span> <span class="org-variable-name">node</span> <span class="org-variable-name">v</span> =
+      <span class="org-keyword">match</span> node <span class="org-keyword">with</span>
+        <span class="org-tuareg-font-lock-constructor">Empty</span> -&gt; <span class="org-tuareg-font-lock-constructor">Node</span>(v, <span class="org-tuareg-font-lock-constructor">Empty</span>, <span class="org-tuareg-font-lock-constructor">Empty</span>)
+      | <span class="org-tuareg-font-lock-constructor">Node</span> (x, l, r) -&gt; <span class="org-keyword">match</span> <span class="org-tuareg-font-lock-module">Val.</span>compare x v <span class="org-keyword">with</span>
+                           <span class="org-tuareg-font-lock-constructor">Equal</span> -&gt; <span class="org-tuareg-font-lock-constructor">Node</span> (x, l, r)
+                         | <span class="org-tuareg-font-lock-constructor">Less</span> -&gt; <span class="org-tuareg-font-lock-constructor">Node</span>(x, l, insert r v)
+                         | <span class="org-tuareg-font-lock-constructor">Greater</span> -&gt; <span class="org-tuareg-font-lock-constructor">Node</span>(x, insert l v, r)
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">inorder</span> <span class="org-variable-name">node</span> =
+      <span class="org-keyword">match</span> node <span class="org-keyword">with</span>
+        <span class="org-tuareg-font-lock-constructor">Empty</span> -&gt; ()
+      | <span class="org-tuareg-font-lock-constructor">Node</span> (x, l, r) -&gt; inorder l; <span class="org-tuareg-font-lock-module">Val.</span>print x; inorder r
+  <span class="org-tuareg-font-lock-governing">end</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+</div>
+
+<div id="outline-container-orge809dcf" class="outline-4">
+<h4 id="orge809dcf"><span class="section-number-4">4.2.1</span> Using the Functor<a aria-hidden="true" href="#orge809dcf">#</a> </h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+We need to define a module that fulfills the signature of <code>COMPARABLE</code>.
+</p>
+<details id='orgd0a4619' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#orgd0a4619'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">IntComp</span> =
+  <span class="org-tuareg-font-lock-governing">struct</span>
+    <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">t</span> = int
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">compare</span> <span class="org-variable-name">l</span> <span class="org-variable-name">r</span> = <span class="org-keyword">if</span> l &lt; r <span class="org-keyword">then</span> <span class="org-tuareg-font-lock-constructor">Less</span>
+      <span class="org-keyword">else</span> <span class="org-keyword">if</span> l &gt; r <span class="org-keyword">then</span> <span class="org-tuareg-font-lock-constructor">Greater</span>
+      <span class="org-keyword">else</span> <span class="org-tuareg-font-lock-constructor">Equal</span>
+    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">print</span> <span class="org-variable-name">v</span> = <span class="org-tuareg-font-lock-module">Printf.</span>printf <span class="org-string">"%d\n"</span> v
+  <span class="org-tuareg-font-lock-governing">end</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+
+<p>
+Then pass it into our <code>BinarySearchTree</code> functor.
+</p>
+<details id='org1926159' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org1926159'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">IntBST</span> = <span class="org-tuareg-font-lock-module">BinarySearchTree(IntComp)</span><span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<p>
+And finally compose functions with this module.
+</p>
+<details id='org0a7e0df' class='code' open><summary><span class='lang'>Objective Caml</span></summary>
+<div class='gutter'>
+<a href='#org0a7e0df'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<div class="org-src-container">
+<pre class="src src-ocaml"><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">my_int_btree</span> = <span class="org-tuareg-font-lock-module">List.</span>fold_left <span class="org-tuareg-font-lock-module">IntBST.</span>insert <span class="org-tuareg-font-lock-module">IntBST.</span>empty [<span class="org-highlight-numbers-number">1</span>;<span class="org-highlight-numbers-number">5</span>;<span class="org-highlight-numbers-number">100</span>]<span class="org-tuareg-font-double-semicolon">;;</span>
+<span class="org-tuareg-font-lock-governing">let</span> () = <span class="org-tuareg-font-lock-module">IntBST.</span>inorder my_int_btree<span class="org-tuareg-font-double-semicolon">;;</span>
+</pre>
+</div>
+</details>
+
+<details id='org650bd0a' class='code' open>
+<summary></summary>
+<div class='gutter'><a href='#org650bd0a'>#</a>
+<button title='Copy to clipboard' onclick='copyPreToClipdord(this)'>⎘</button></div>
+<pre class="example">
+5
+10
+100
+</pre>
+
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2021-03-01 14:57; CST</p>
+<p class="author">Author: Chase Johnson</p>
+<p class="date">Created: 2021-03-01 Mon 14:57</p>
+</div>
+</div>
+</body>
+</html>
